@@ -46,7 +46,7 @@ class TestUserService:
         )
 
         result = await create_new_user(user_request, async_db_session)
-        assert result["message"] == "User created successfully"
+        assert result["message"] == "Usuário criado com sucesso"
 
         # Verify user was created
         stmt = select(User).where(User.username == "servicetest")
@@ -71,7 +71,7 @@ class TestUserService:
             await create_new_user(user_request, async_db_session)
 
         assert exc_info.value.status_code == 400
-        assert "Username already exists" in exc_info.value.detail
+        assert "Nome de usuário já existe" in exc_info.value.detail
 
     @pytest.mark.asyncio
     async def test_get_user_by_username_success(self, async_db_session):
@@ -99,7 +99,7 @@ class TestUserService:
             await get_user_by_username("nonexistent", async_db_session)
 
         assert exc_info.value.status_code == 404
-        assert "User not found" in exc_info.value.detail
+        assert "Usuário não encontrado" in exc_info.value.detail
 
     @pytest.mark.asyncio
     async def test_get_users_by_minimum_age_service(self, async_db_session):

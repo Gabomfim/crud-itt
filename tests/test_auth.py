@@ -43,7 +43,7 @@ class TestAuthenticationAPI:
 
         assert response.status_code == 401
         data = response.json()
-        assert "Invalid username or password" in data["detail"]
+        assert "Nome de usuário ou senha inválidos" in data["detail"]
 
     def test_login_invalid_password(self, client: TestClient, sample_user):
         """Test login with invalid password"""
@@ -56,7 +56,7 @@ class TestAuthenticationAPI:
 
         assert response.status_code == 401
         data = response.json()
-        assert "Invalid username or password" in data["detail"]
+        assert "Nome de usuário ou senha inválidos" in data["detail"]
 
     def test_login_missing_fields(self, client: TestClient):
         """Test login with missing fields"""

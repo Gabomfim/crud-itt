@@ -54,7 +54,7 @@ class TestAuthService:
             await authenticate_user("nonexistent", "TestPass123!", async_db_session)
 
         assert exc_info.value.status_code == 401
-        assert "Invalid username or password" in exc_info.value.detail
+        assert "Nome de usuário ou senha inválidos" in exc_info.value.detail
 
     @pytest.mark.asyncio
     async def test_authenticate_user_wrong_password(self, async_db_session):
@@ -70,4 +70,4 @@ class TestAuthService:
             await authenticate_user("authtest2", "WrongPass456!", async_db_session)
 
         assert exc_info.value.status_code == 401
-        assert "Invalid username or password" in exc_info.value.detail
+        assert "Nome de usuário ou senha inválidos" in exc_info.value.detail

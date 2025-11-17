@@ -9,14 +9,14 @@ class TestUserAPI:
         response = client.get("/")
         assert response.status_code == 200
         assert "text/html" in response.headers["content-type"]
-        assert "User Management API" in response.text
+        assert "API de Gerenciamento de Usuários" in response.text
 
     def test_create_user_success(self, client: TestClient, sample_user):
         """Test successful user creation"""
         response = client.post("/api/v1/users", json=sample_user)
         assert response.status_code == 201
         data = response.json()
-        assert data["message"] == "User created successfully"
+        assert data["message"] == "Usuário criado com sucesso"
 
     def test_create_user_invalid_data(self, client: TestClient):
         """Test user creation with invalid data"""
@@ -39,7 +39,7 @@ class TestUserAPI:
         response = client.post("/api/v1/users", json=sample_user)
         assert response.status_code == 400
         data = response.json()
-        assert "Username already exists" in data["detail"]
+        assert "Nome de usuário já existe" in data["detail"]
 
     def test_get_user_success(self, client: TestClient, auth_headers, sample_user):
         """Test successful user retrieval"""
@@ -60,7 +60,7 @@ class TestUserAPI:
         response = client.get("/api/v1/users/nonexistent", headers=auth_headers)
         assert response.status_code == 404
         data = response.json()
-        assert "User not found" in data["detail"]
+        assert "Usuário não encontrado" in data["detail"]
 
     def test_get_users_by_minimum_age(self, client: TestClient, auth_headers):
         """Test getting users by minimum age"""
@@ -110,7 +110,7 @@ class TestUserAPI:
         response = client.get("/api/v1/users?minimum_age=100", headers=auth_headers)
         assert response.status_code == 404
         data = response.json()
-        assert "No users found" in data["detail"]
+        assert "Nenhum usuário encontrado" in data["detail"]
 
     def test_update_user_success(self, client: TestClient, auth_headers, sample_user):
         """Test successful user update"""
@@ -180,7 +180,7 @@ class TestUserAPI:
         response = client.get("/nonexistent-page")
         assert response.status_code == 404
         assert "text/html" in response.headers["content-type"]
-        assert "Page Not Found" in response.text
+        assert "Página Não Encontrada" in response.text
 
     def test_change_password_success(self, client: TestClient, sample_user):
         """Test successful password change with authentication"""
