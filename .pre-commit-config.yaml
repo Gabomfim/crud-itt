@@ -30,6 +30,14 @@ repos:
         pass_filenames: false
         always_run: true
 
+      - id: poetry-lock
+        name: poetry-lock
+        description: Update poetry.lock when pyproject.toml changes
+        entry: poetry lock
+        language: system
+        files: ^pyproject\.toml$
+        pass_filenames: false
+
       - id: pytest
         name: Run tests
         entry: /Users/silvs/opt/miniconda3/bin/python -m pytest
