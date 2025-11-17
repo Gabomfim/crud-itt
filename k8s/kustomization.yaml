@@ -1,0 +1,53 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+metadata:
+  name: crud-itt-kustomization
+
+# Namespace for all resources
+namespace: crud-itt
+
+# Resources to include
+resources:
+  - namespace.yaml
+  - configmap.yaml
+  - secret.yaml
+  - pvc.yaml
+  - deployment.yaml
+  - service.yaml
+  - ingress.yaml
+
+# Labels to apply to all resources
+commonLabels:
+  app: fastapi-crud
+  environment: production
+  managed-by: kustomize
+
+# Annotations to apply to all resources
+commonAnnotations:
+  description: "FastAPI CRUD Application"
+  version: "1.0.0"
+
+# Image transformations
+images:
+  - name: crud-itt
+    newTag: latest
+
+# ConfigMap generator (optional, can be used instead of configmap.yaml)
+# configMapGenerator:
+#   - name: crud-itt-config
+#     literals:
+#       - DATABASE_URL=sqlite+aiosqlite:///./data/app.db
+#       - HOST=0.0.0.0
+#       - PORT=8000
+
+# Secret generator (optional, can be used instead of secret.yaml)
+# secretGenerator:
+#   - name: crud-itt-secrets
+#     literals:
+#       - JWT_SECRET_KEY=your-secret-key-here
+
+# Replica count (can be overridden in overlays)
+replicas:
+  - name: crud-itt-app
+    count: 2

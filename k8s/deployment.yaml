@@ -1,0 +1,93 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crud-itt-app
+  namespace: crud-itt
+  labels:
+    app: fastapi-crud
+    version: v1
+  annotations:
+    # Enable log collection
+    fluentd.active: "true"
+    logging.coreos.com/logfile: "/dev/stdout"
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: fastapi-crud
+  template:
+    metadata:
+      labels:
+        app: fastapi-crud
+        version: v1
+    spec:
+      containers:
+      - name: fastapi-crud
+        image: crud-itt:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8000
+          name: http
+          protocol: TCP
+        
+        # Environment variables from ConfigMap and Secret
+        envFrom:
+        - configMapRef:
+            name: crud-itt-config
+        - secretRef:
+            name: crud-itt-secrets
+        
+        # Resource limits and requests
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        
+        # Health checks
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        
+        # Volume mounts
+        volumeMounts:
+        - name: database-storage
+          mountPath: /app/data
+        
+        # Security context
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 1000
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: false
+          capabilities:
+            drop:
+            - ALL
+      
+      volumes:
+      - name: database-storage
+        persistentVolumeClaim:
+          claimName: crud-itt-database-pvc
+      
+      # Security context for the pod
+      securityContext:
+        fsGroup: 1000
+      
+      # Restart policy
+      restartPolicy: Always
