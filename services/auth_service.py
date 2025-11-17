@@ -1,26 +1,26 @@
 """
-Authentication Service Module
+Módulo de Serviço de Autenticação
 
-This module provides comprehensive JWT-based authentication services including
-token generation, validation, blacklisting, and user authentication. It handles
-secure login/logout operations and provides dependency injection for protected
-endpoints.
+Este módulo fornece serviços abrangentes de autenticação baseados em JWT,
+incluindo geração de tokens, validação, lista negra e autenticação de
+usuários. Gerencia operações seguras de login/logout e fornece injeção de
+dependência para endpoints protegidos.
 
-Key Features:
-- JWT token creation and validation
-- Token blacklisting for secure logout
-- User authentication with password verification
-- Dependency injection for protected routes
-- Comprehensive logging and error handling
+Recursos Principais:
+- Criação e validação de tokens JWT
+- Lista negra de tokens para logout seguro
+- Autenticação de usuário com verificação de senha
+- Injeção de dependência para rotas protegidas
+- Logging abrangente e tratamento de erros
 
-Security Features:
-- Configurable token expiration
-- Secure token blacklisting mechanism
-- Password hash verification
-- Detailed security event logging
+Recursos de Segurança:
+- Expiração configurável de tokens
+- Mecanismo seguro de lista negra de tokens
+- Verificação de hash de senha
+- Logging detalhado de eventos de segurança
 
-Author: Gabomfim
-License: MIT
+Autor: Gabomfim
+Licença: MIT
 """
 
 from datetime import datetime, timedelta
@@ -40,7 +40,7 @@ from utils.logging_config import get_logger
 logger = get_logger(__name__)
 security = HTTPBearer(auto_error=False)
 
-# In-memory token blacklist (in production, use Redis or database)
+# Lista negra de tokens em memória (em produção, use Redis ou banco de dados)
 _blacklisted_tokens: Set[str] = set()
 
 
@@ -48,60 +48,66 @@ async def authenticate_user(
     username: str, password: str, db: AsyncSession = Depends(get_db)
 ) -> User:
     """
-    Authenticate a user by username and password.
+    Autentica um usuário por nome de usuário e senha.
 
-    This function performs secure user authentication by validating
-    the provided credentials against the database. It uses constant-time
-    password comparison to prevent timing attacks.
+    Esta função realiza autenticação segura do usuário validando as
+    credenciais fornecidas contra o banco de dados. Usa comparação de
+    senha em tempo constante para prevenir ataques de timing.
 
     Args:
-        username (str): Username to authenticate
-        password (str): Plain text password for verification
-        db (AsyncSession): Async database session dependency
+        username (str): Nome de usuário para autenticar
+        password (str): Senha em texto plano para verificação
+        db (AsyncSession): Dependência de sessão assíncrona do banco
 
     Returns:
-        User: The authenticated user object with all user data
+        User: O objeto do usuário autenticado com todos os dados do usuário
 
     Raises:
-        HTTPException: 401 Unauthorized if username doesn't exist or password
-                      is incorrect
+        HTTPException: 401 Não Autorizado se o nome de usuário não existir
+                      ou a senha estiver incorreta
 
     Example:
         >>> user = await authenticate_user("john_doe", "secure_password123", db)
         >>> print(user.username)  # "john_doe"
 
-    Security Notes:
-        - Uses bcrypt for secure password verification
-        - Returns same error message for invalid username/password to prevent
-          enumeration
-        - Logs authentication attempts for security monitoring
+    Notas de Segurança:
+        - Usa bcrypt para verificação segura de senha
+        - Retorna a mesma mensagem de erro para nome/senha inválidos para
+          prevenir enumeração
+        - Registra tentativas de autenticação para monitoramento de segurança
     """
     result = await db.execute(select(User).where(User.username == username))
     user = result.scalar_one_or_none()
     if not user:
-        raise HTTPException(status_code=401, detail="Invalid username or password")
+        raise HTTPException(
+            status_code=401, detail="Nome de usuário ou senha inválidos"
+        )
 
     if not verify_password(password, user.password):
-        raise HTTPException(status_code=401, detail="Invalid username or password")
+        raise HTTPException(
+            status_code=401, detail="Nome de usuário ou senha inválidos"
+        )
 
     return user
 
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
     """
-    Create a JWT access token with configurable expiration.
+    Cria um token de acesso JWT com expiração configurável.
 
-    This function generates a secure JSON Web Token containing user data
-    and expiration information. The token is signed with the application's
-    secret key using the configured algorithm.
+    Esta função gera um JSON Web Token seguro contendo dados do usuário
+    e informações de expiração. O token é assinado com a chave secreta
+    da aplicação usando o algoritmo configurado.
 
     Args:
-        data (dict): Payload data to encode in the token (typically user info)
-        expires_delta (Optional[timedelta]): Custom token expiration time.
-            If None, uses the configured default expiration time.
+        data (dict): Dados de payload para codificar no token (tipicamente
+                    informações do usuário)
+        expires_delta (Optional[timedelta]): Tempo de expiração customizado
+            do token. Se None, usa o tempo de expiração padrão configurado.
 
     Returns:
-        str: Encoded JWT token string ready for use in Authorization headers
+        str: String do token JWT codificado pronto para uso em cabeçalhos
+            Authorization
 
     Example:
         >>> token = create_access_token({"sub": "john_doe"})
@@ -110,11 +116,11 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
         >>> custom_expiry = timedelta(hours=2)
         >>> token = create_access_token({"sub": "admin"}, custom_expiry)
 
-    Security Notes:
-        - Token includes 'iat' (issued at) claim for security tracking
-        - Uses HS256 algorithm by default (configurable)
-        - Secret key should be at least 32 characters long
-        - Tokens are stateless and self-contained
+    Notas de Segurança:
+        - Token inclui claim 'iat' (emitido em) para rastreamento de segurança
+        - Usa algoritmo HS256 por padrão (configurável)
+        - Chave secreta deve ter pelo menos 32 caracteres
+        - Tokens são stateless e auto-contidos
     """
     to_encode = data.copy()
     if expires_delta:
@@ -132,7 +138,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
         algorithm=settings.security.jwt_algorithm,
     )
 
-    logger.info("Access token created", extra={"username": data.get("sub")})
+    logger.info("Token de acesso criado", extra={"username": data.get("sub")})
     return encoded_jwt
 
 

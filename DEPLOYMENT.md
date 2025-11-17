@@ -1,33 +1,33 @@
-# GitHub Actions Deployment Setup
+# Configuração de Deploy GitHub Actions
 
-This document provides instructions for setting up the GitHub Actions deployment workflows for staging and production environments.
+Este documento fornece instruções para configurar os workflows de deploy do GitHub Actions para ambientes de staging e produção.
 
-## Overview
+## Visão Geral
 
-The deployment system includes:
-- **Staging Deployment**: Triggered on pushes to `staging` branch
-- **Production Deployment**: Triggered on pushes to `main` branch
-- **Enhanced Security**: Includes vulnerability scanning, staging verification, and rollback capabilities
-- **Multi-Environment Support**: Configurable for different cloud providers and Kubernetes clusters
+O sistema de deploy inclui:
+- **Deploy de Staging**: Acionado em pushes para branch `staging`
+- **Deploy de Produção**: Acionado em pushes para branch `main`
+- **Segurança Aprimorada**: Inclui escaneamento de vulnerabilidades, verificação de staging e capacidades de rollback
+- **Suporte Multi-Ambiente**: Configurável para diferentes provedores de nuvem e clusters Kubernetes
 
-## Required Secrets
+## Secrets Obrigatórios
 
-### Repository Secrets
+### Secrets do Repositório
 
-Configure these secrets in your GitHub repository settings (`Settings > Secrets and variables > Actions`):
+Configure estes secrets nas configurações do seu repositório GitHub (`Settings > Secrets and variables > Actions`):
 
-#### Container Registry
+#### Registry de Container
 ```
-GITHUB_TOKEN (automatically provided by GitHub)
+GITHUB_TOKEN (fornecido automaticamente pelo GitHub)
 ```
 
-#### Kubernetes Configuration
+#### Configuração Kubernetes
 ```
-# For staging environment
-KUBE_CONFIG_STAGING: Base64 encoded kubeconfig for staging cluster
+# Para ambiente de staging
+KUBE_CONFIG_STAGING: Kubeconfig codificado em Base64 para cluster de staging
 
-# For production environment  
-KUBE_CONFIG_PRODUCTION: Base64 encoded kubeconfig for production cluster
+# Para ambiente de produção  
+KUBE_CONFIG_PRODUCTION: Kubeconfig codificado em Base64 para cluster de produção
 ```
 
 #### AWS (if using EKS)
