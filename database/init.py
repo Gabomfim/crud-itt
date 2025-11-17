@@ -43,49 +43,49 @@ from services.password_service import hash_password
 
 def init_db() -> None:
     """Initialize database with sample user data for development and testing.
-    
+
     This function creates initial user accounts with secure passwords for
     development and testing purposes. It checks for existing users to avoid
     duplication and provides console output for credential information.
-    
+
     WARNING: This function uses synchronous database operations which are
     inconsistent with the async architecture of the rest of the application.
     It should be updated to use async/await patterns.
-    
+
     Sample Users Created:
         - Username: "lavinia", Password: "Lavinia123!", Age: 16
         - Username: "gabriel", Password: "Gabriel456@", Age: 26
-    
+
     Security Features:
         - Passwords are hashed using secure bcrypt algorithm
         - Strong password patterns with mixed case, numbers, and symbols
         - No plaintext password storage
-    
+
     Behavior:
         - Only creates users if database is empty (prevents duplicates)
         - Commits transaction only after all users are added
         - Provides console feedback for development workflow
         - Handles database session cleanup
-    
+
     Raises:
         Database exceptions if connection fails or constraints are violated
-    
+
     Development Usage:
         ```bash
         # Run standalone
         python -m database.init
-        
+
         # Or import and call
         from database.init import init_db
         init_db()
         ```
-    
+
     Integration Notes:
         - Suitable for development environment setup
         - Can be integrated into testing fixtures
         - Should be excluded from production deployments
         - Consider using database migrations for production schema changes
-    
+
     TODO Items:
         - Convert to async function using AsyncSession
         - Add environment checks to prevent production usage

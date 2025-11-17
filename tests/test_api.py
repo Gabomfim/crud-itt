@@ -172,12 +172,15 @@ class TestUserAPI:
         """Test successful password change with authentication"""
         # Create user first
         client.post("/api/v1/users", json=sample_user)
-        
+
         # Login to get token
-        login_response = client.post("/api/v1/auth/login", json={
-            "username": sample_user["username"],
-            "password": sample_user["password"]
-        })
+        login_response = client.post(
+            "/api/v1/auth/login",
+            json={
+                "username": sample_user["username"],
+                "password": sample_user["password"],
+            },
+        )
         token = login_response.json()["token"]["access_token"]
         headers = {"Authorization": f"Bearer {token}"}
 
@@ -185,27 +188,32 @@ class TestUserAPI:
         password_change_data = {
             "current_password": sample_user["password"],
             "new_password": "NewPassword123!@#",
-            "confirm_password": "NewPassword123!@#"
+            "confirm_password": "NewPassword123!@#",
         }
         response = client.put(
             f"/api/v1/users/{sample_user['username']}/password",
             json=password_change_data,
-            headers=headers
+            headers=headers,
         )
         assert response.status_code == 200
         data = response.json()
         assert data["message"] == "Password changed successfully"
 
-    def test_change_password_wrong_current_password(self, client: TestClient, sample_user):
+    def test_change_password_wrong_current_password(
+        self, client: TestClient, sample_user
+    ):
         """Test password change with wrong current password"""
         # Create user first
         client.post("/api/v1/users", json=sample_user)
-        
+
         # Login to get token
-        login_response = client.post("/api/v1/auth/login", json={
-            "username": sample_user["username"],
-            "password": sample_user["password"]
-        })
+        login_response = client.post(
+            "/api/v1/auth/login",
+            json={
+                "username": sample_user["username"],
+                "password": sample_user["password"],
+            },
+        )
         token = login_response.json()["token"]["access_token"]
         headers = {"Authorization": f"Bearer {token}"}
 
@@ -213,12 +221,12 @@ class TestUserAPI:
         password_change_data = {
             "current_password": "WrongPassword123!",
             "new_password": "NewPassword123!@#",
-            "confirm_password": "NewPassword123!@#"
+            "confirm_password": "NewPassword123!@#",
         }
         response = client.put(
             f"/api/v1/users/{sample_user['username']}/password",
             json=password_change_data,
-            headers=headers
+            headers=headers,
         )
         assert response.status_code == 400
         data = response.json()
@@ -228,12 +236,15 @@ class TestUserAPI:
         """Test password change with same password as current"""
         # Create user first
         client.post("/api/v1/users", json=sample_user)
-        
+
         # Login to get token
-        login_response = client.post("/api/v1/auth/login", json={
-            "username": sample_user["username"],
-            "password": sample_user["password"]
-        })
+        login_response = client.post(
+            "/api/v1/auth/login",
+            json={
+                "username": sample_user["username"],
+                "password": sample_user["password"],
+            },
+        )
         token = login_response.json()["token"]["access_token"]
         headers = {"Authorization": f"Bearer {token}"}
 
@@ -241,27 +252,32 @@ class TestUserAPI:
         password_change_data = {
             "current_password": sample_user["password"],
             "new_password": sample_user["password"],
-            "confirm_password": sample_user["password"]
+            "confirm_password": sample_user["password"],
         }
         response = client.put(
             f"/api/v1/users/{sample_user['username']}/password",
             json=password_change_data,
-            headers=headers
+            headers=headers,
         )
         assert response.status_code == 400
         data = response.json()
         assert "New password must be different from current password" in data["detail"]
 
-    def test_change_password_mismatch_confirmation(self, client: TestClient, sample_user):
+    def test_change_password_mismatch_confirmation(
+        self, client: TestClient, sample_user
+    ):
         """Test password change with mismatched confirmation"""
         # Create user first
         client.post("/api/v1/users", json=sample_user)
-        
+
         # Login to get token
-        login_response = client.post("/api/v1/auth/login", json={
-            "username": sample_user["username"],
-            "password": sample_user["password"]
-        })
+        login_response = client.post(
+            "/api/v1/auth/login",
+            json={
+                "username": sample_user["username"],
+                "password": sample_user["password"],
+            },
+        )
         token = login_response.json()["token"]["access_token"]
         headers = {"Authorization": f"Bearer {token}"}
 
@@ -269,12 +285,12 @@ class TestUserAPI:
         password_change_data = {
             "current_password": sample_user["password"],
             "new_password": "NewPassword123!@#",
-            "confirm_password": "DifferentPassword123!@#"
+            "confirm_password": "DifferentPassword123!@#",
         }
         response = client.put(
             f"/api/v1/users/{sample_user['username']}/password",
             json=password_change_data,
-            headers=headers
+            headers=headers,
         )
         assert response.status_code == 422  # Pydantic validation error
         data = response.json()
@@ -284,12 +300,15 @@ class TestUserAPI:
         """Test password change with weak new password"""
         # Create user first
         client.post("/api/v1/users", json=sample_user)
-        
+
         # Login to get token
-        login_response = client.post("/api/v1/auth/login", json={
-            "username": sample_user["username"],
-            "password": sample_user["password"]
-        })
+        login_response = client.post(
+            "/api/v1/auth/login",
+            json={
+                "username": sample_user["username"],
+                "password": sample_user["password"],
+            },
+        )
         token = login_response.json()["token"]["access_token"]
         headers = {"Authorization": f"Bearer {token}"}
 
@@ -297,12 +316,12 @@ class TestUserAPI:
         password_change_data = {
             "current_password": sample_user["password"],
             "new_password": "weak",
-            "confirm_password": "weak"
+            "confirm_password": "weak",
         }
         response = client.put(
             f"/api/v1/users/{sample_user['username']}/password",
             json=password_change_data,
-            headers=headers
+            headers=headers,
         )
         assert response.status_code == 422  # Pydantic validation error
         data = response.json()
@@ -313,23 +332,26 @@ class TestUserAPI:
         """Test password change for nonexistent user"""
         # Create user and login to get auth token
         client.post("/api/v1/users", json=sample_user)
-        login_response = client.post("/api/v1/auth/login", json={
-            "username": sample_user["username"],
-            "password": sample_user["password"]
-        })
+        login_response = client.post(
+            "/api/v1/auth/login",
+            json={
+                "username": sample_user["username"],
+                "password": sample_user["password"],
+            },
+        )
         token = login_response.json()["token"]["access_token"]
         headers = {"Authorization": f"Bearer {token}"}
-        
+
         # Try to change password for a different nonexistent user
         password_change_data = {
             "current_password": "CurrentPassword123!",
             "new_password": "NewPassword123!@#",
-            "confirm_password": "NewPassword123!@#"
+            "confirm_password": "NewPassword123!@#",
         }
         response = client.put(
             "/api/v1/users/nonexistent_user/password",
             json=password_change_data,
-            headers=headers
+            headers=headers,
         )
         assert response.status_code == 404
         data = response.json()

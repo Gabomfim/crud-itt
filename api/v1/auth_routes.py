@@ -7,7 +7,7 @@ REST conventions and provide comprehensive error handling.
 
 Endpoints:
 - POST /login: Authenticate user and return JWT token
-- POST /logout: Revoke JWT token and log out user  
+- POST /logout: Revoke JWT token and log out user
 - GET /me: Get current authenticated user information
 
 Features:

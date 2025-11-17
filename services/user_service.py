@@ -3,7 +3,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from database.connection import User, get_db
-from models.requests import UserRequest, PasswordChangeRequest
+from models.requests import PasswordChangeRequest, UserRequest
 from models.responses import UserResponse
 from services.password_service import hash_password, verify_password
 from utils.logging_config import get_logger
@@ -222,9 +222,9 @@ async def update_user_by_username(
 
 
 async def change_user_password(
-    username: str, 
-    password_request: PasswordChangeRequest, 
-    db: AsyncSession = Depends(get_db)
+    username: str,
+    password_request: PasswordChangeRequest,
+    db: AsyncSession = Depends(get_db),
 ) -> dict[str, str]:
     """Change user password after verifying current password"""
     logger.info("Changing password for user", extra={"username": username})
@@ -235,18 +235,27 @@ async def change_user_password(
         user = result.scalar_one_or_none()
 
         if not user:
-            logger.warning("User not found for password change", extra={"username": username})
+            logger.warning(
+                "User not found for password change", extra={"username": username}
+            )
             raise HTTPException(status_code=404, detail="User not found")
 
         # Verify current password
         if not verify_password(password_request.current_password, user.password):
-            logger.warning("Invalid current password provided", extra={"username": username})
+            logger.warning(
+                "Invalid current password provided", extra={"username": username}
+            )
             raise HTTPException(status_code=400, detail="Current password is incorrect")
 
         # Check if new password is the same as current password
         if verify_password(password_request.new_password, user.password):
-            logger.warning("New password same as current password", extra={"username": username})
-            raise HTTPException(status_code=400, detail="New password must be different from current password")
+            logger.warning(
+                "New password same as current password", extra={"username": username}
+            )
+            raise HTTPException(
+                status_code=400,
+                detail="New password must be different from current password",
+            )
 
         # Hash new password and update user
         hashed_new_password = hash_password(password_request.new_password)

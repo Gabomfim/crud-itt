@@ -1,6 +1,6 @@
 import pytest
 from fastapi.testclient import TestClient
-from fastapi import status
+
 from services.auth_service import _blacklisted_tokens
 
 
@@ -23,10 +23,10 @@ class TestAuthenticationAPI:
         # Login
         login_data = {
             "username": sample_user["username"],
-            "password": sample_user["password"]
+            "password": sample_user["password"],
         }
         response = client.post("/api/v1/auth/login", json=login_data)
-        
+
         assert response.status_code == 200
         data = response.json()
         assert data["message"] == "Login successful"
@@ -38,12 +38,9 @@ class TestAuthenticationAPI:
 
     def test_login_invalid_username(self, client: TestClient):
         """Test login with invalid username"""
-        login_data = {
-            "username": "nonexistent_user",
-            "password": "password123"
-        }
+        login_data = {"username": "nonexistent_user", "password": "password123"}
         response = client.post("/api/v1/auth/login", json=login_data)
-        
+
         assert response.status_code == 401
         data = response.json()
         assert "Invalid username or password" in data["detail"]
@@ -54,12 +51,9 @@ class TestAuthenticationAPI:
         client.post("/api/v1/users", json=sample_user)
 
         # Try login with wrong password
-        login_data = {
-            "username": sample_user["username"],
-            "password": "wrongpassword"
-        }
+        login_data = {"username": sample_user["username"], "password": "wrongpassword"}
         response = client.post("/api/v1/auth/login", json=login_data)
-        
+
         assert response.status_code == 401
         data = response.json()
         assert "Invalid username or password" in data["detail"]
@@ -78,16 +72,19 @@ class TestAuthenticationAPI:
         """Test successful logout"""
         # Create user and login
         client.post("/api/v1/users", json=sample_user)
-        login_response = client.post("/api/v1/auth/login", json={
-            "username": sample_user["username"],
-            "password": sample_user["password"]
-        })
+        login_response = client.post(
+            "/api/v1/auth/login",
+            json={
+                "username": sample_user["username"],
+                "password": sample_user["password"],
+            },
+        )
         token = login_response.json()["token"]["access_token"]
 
         # Logout
         headers = {"Authorization": f"Bearer {token}"}
         response = client.post("/api/v1/auth/logout", headers=headers)
-        
+
         assert response.status_code == 200
         data = response.json()
         assert data["message"] == "Logout successful"
@@ -107,10 +104,13 @@ class TestAuthenticationAPI:
         """Test that token is blacklisted after logout"""
         # Create user and login
         client.post("/api/v1/users", json=sample_user)
-        login_response = client.post("/api/v1/auth/login", json={
-            "username": sample_user["username"],
-            "password": sample_user["password"]
-        })
+        login_response = client.post(
+            "/api/v1/auth/login",
+            json={
+                "username": sample_user["username"],
+                "password": sample_user["password"],
+            },
+        )
         token = login_response.json()["token"]["access_token"]
         headers = {"Authorization": f"Bearer {token}"}
 
@@ -130,16 +130,19 @@ class TestAuthenticationAPI:
         """Test getting current user info"""
         # Create user and login
         client.post("/api/v1/users", json=sample_user)
-        login_response = client.post("/api/v1/auth/login", json={
-            "username": sample_user["username"],
-            "password": sample_user["password"]
-        })
+        login_response = client.post(
+            "/api/v1/auth/login",
+            json={
+                "username": sample_user["username"],
+                "password": sample_user["password"],
+            },
+        )
         token = login_response.json()["token"]["access_token"]
 
         # Get current user info
         headers = {"Authorization": f"Bearer {token}"}
         response = client.get("/api/v1/auth/me", headers=headers)
-        
+
         assert response.status_code == 200
         data = response.json()
         assert data["username"] == sample_user["username"]
@@ -160,16 +163,21 @@ class TestAuthenticationAPI:
         """Test accessing protected endpoint with authentication"""
         # Create user and login
         client.post("/api/v1/users", json=sample_user)
-        login_response = client.post("/api/v1/auth/login", json={
-            "username": sample_user["username"],
-            "password": sample_user["password"]
-        })
+        login_response = client.post(
+            "/api/v1/auth/login",
+            json={
+                "username": sample_user["username"],
+                "password": sample_user["password"],
+            },
+        )
         token = login_response.json()["token"]["access_token"]
 
         # Access protected endpoint
         headers = {"Authorization": f"Bearer {token}"}
-        response = client.get(f"/api/v1/users/{sample_user['username']}", headers=headers)
-        
+        response = client.get(
+            f"/api/v1/users/{sample_user['username']}", headers=headers
+        )
+
         assert response.status_code == 200
         data = response.json()
         assert data["username"] == sample_user["username"]
@@ -186,26 +194,26 @@ class TestAuthenticationAPI:
         client.post("/api/v1/users", json=sample_user)
         login_data = {
             "username": sample_user["username"],
-            "password": sample_user["password"]
+            "password": sample_user["password"],
         }
 
         # Login twice
         response1 = client.post("/api/v1/auth/login", json=login_data)
         response2 = client.post("/api/v1/auth/login", json=login_data)
-        
+
         assert response1.status_code == 200
         assert response2.status_code == 200
-        
+
         token1 = response1.json()["token"]["access_token"]
         token2 = response2.json()["token"]["access_token"]
-        
+
         # Both tokens should work
         headers1 = {"Authorization": f"Bearer {token1}"}
         headers2 = {"Authorization": f"Bearer {token2}"}
-        
+
         response1 = client.get("/api/v1/auth/me", headers=headers1)
         response2 = client.get("/api/v1/auth/me", headers=headers2)
-        
+
         assert response1.status_code == 200
         assert response2.status_code == 200
 
@@ -218,10 +226,10 @@ class TestAuthenticationAPI:
         password_change_data = {
             "current_password": sample_user["password"],
             "new_password": "NewPassword123!@#",
-            "confirm_password": "NewPassword123!@#"
+            "confirm_password": "NewPassword123!@#",
         }
         response = client.put(
             f"/api/v1/users/{sample_user['username']}/password",
-            json=password_change_data
+            json=password_change_data,
         )
         assert response.status_code == 401

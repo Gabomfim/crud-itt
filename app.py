@@ -43,20 +43,20 @@ logger = get_logger(__name__)
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """
     Manage the application lifecycle with startup and shutdown events.
-    
+
     This function handles database initialization on startup and cleanup
     on shutdown. It uses an async context manager to ensure proper
     resource management.
-    
+
     Args:
         app (FastAPI): The FastAPI application instance
-        
+
     Yields:
         None: Control is yielded during application runtime
-        
+
     Raises:
         Exception: Any exception during database initialization
-        
+
     Example:
         This function is automatically called by FastAPI during
         application startup and shutdown.
@@ -116,21 +116,21 @@ app.include_router(api_router, prefix="/api/v1")
 async def read_root(request: Request) -> StarletteResponse:
     """
     Serve the root HTML page of the application.
-    
+
     This endpoint serves the main landing page using Jinja2 templates.
     It provides a user-friendly interface with application information
     and navigation links.
-    
+
     Args:
         request (Request): The FastAPI request object containing client information
-        
+
     Returns:
         StarletteResponse: Rendered HTML template with application content
-        
+
     Example:
         GET / HTTP/1.1
         Host: localhost:8000
-        
+
         Response: HTML page with application interface
     """
     logger.info("Serving root page")
@@ -144,25 +144,25 @@ async def custom_404_middleware(
 ) -> Response:
     """
     Custom middleware to handle 404 errors with HTML responses.
-    
+
     This middleware intercepts 404 errors and returns a custom HTML
     error page when the client accesses non-API routes. For API requests,
     it lets the default JSON error response through.
-    
+
     Args:
         request (Request): The incoming HTTP request
         call_next (Callable): The next middleware or endpoint in the chain
-        
+
     Returns:
         Response: Either the original response or custom 404 HTML page
-        
+
     Raises:
         Exception: Re-raises any unhandled exceptions after logging
-        
+
     Example:
         GET /nonexistent-page HTTP/1.1
         Accept: text/html
-        
+
         Response: Custom 404 HTML page
     """
     try:

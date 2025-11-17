@@ -23,29 +23,29 @@ License: MIT
 
 import re
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, ValidationInfo, field_validator
 
 
 class UserRequest(BaseModel):
     """
     User registration and update request model.
-    
+
     This model validates user registration and profile update requests.
     It includes comprehensive validation for username format, password
     complexity, age constraints, and description length.
-    
+
     Attributes:
         username (str): Unique username with alphanumeric and underscore characters
         password (str): Secure password meeting complexity requirements
         age (int): User age between 1 and 120 years
         description (str): Optional user description up to 200 characters
-        
+
     Validation Rules:
         - Username: 3-30 characters, alphanumeric + underscores only
         - Password: Minimum 8 characters with complexity requirements
         - Age: Must be between 1 and 120
         - Description: Maximum 200 characters, optional
-        
+
     Example:
         ```python
         user_data = UserRequest(
@@ -56,6 +56,7 @@ class UserRequest(BaseModel):
         )
         ```
     """
+
     username: str = Field(
         ...,
         min_length=3,
@@ -123,27 +124,27 @@ class UserRequest(BaseModel):
 class PasswordChangeRequest(BaseModel):
     """
     Password change request model with security validation.
-    
+
     This model handles secure password change requests by validating
     the current password, ensuring new password complexity, and
     confirming password matching.
-    
+
     Attributes:
         current_password (str): Current password for identity verification
         new_password (str): New password meeting complexity requirements
         confirm_password (str): Confirmation that must match new_password
-        
+
     Security Features:
         - Current password verification required
         - New password complexity validation
         - Password confirmation matching
         - Prevents password reuse (handled at service level)
-        
+
     Validation Rules:
         - Current password: Required for security verification
         - New password: Must meet all complexity requirements
         - Confirmation: Must exactly match new password
-        
+
     Example:
         ```python
         password_change = PasswordChangeRequest(
@@ -153,10 +154,8 @@ class PasswordChangeRequest(BaseModel):
         )
         ```
     """
-    current_password: str = Field(
-        ...,
-        description="Current password for verification"
-    )
+
+    current_password: str = Field(..., description="Current password for verification")
     new_password: str = Field(
         ...,
         min_length=8,
@@ -166,10 +165,7 @@ class PasswordChangeRequest(BaseModel):
             "number, and symbol"
         ),
     )
-    confirm_password: str = Field(
-        ...,
-        description="Confirmation of the new password"
-    )
+    confirm_password: str = Field(..., description="Confirmation of the new password")
 
     @field_validator("new_password")
     @classmethod
@@ -211,11 +207,11 @@ class PasswordChangeRequest(BaseModel):
 
     @field_validator("confirm_password")
     @classmethod
-    def validate_password_match(cls, v: str, info) -> str:
+    def validate_password_match(cls, v: str, info: ValidationInfo) -> str:
         """
         Validate that confirm_password matches new_password.
         """
-        if 'new_password' in info.data and v != info.data['new_password']:
+        if "new_password" in info.data and v != info.data["new_password"]:
             raise ValueError("Password confirmation does not match new password")
         return v
 
@@ -223,20 +219,20 @@ class PasswordChangeRequest(BaseModel):
 class LoginRequest(BaseModel):
     """
     User authentication login request model.
-    
+
     This model validates user login credentials for authentication.
     It performs basic input validation while keeping the interface
     simple for authentication purposes.
-    
+
     Attributes:
         username (str): Username for authentication (3-30 characters)
         password (str): Password for authentication (no complexity validation here)
-        
+
     Note:
         Password complexity is not validated in login requests since
         users may have accounts created with older password policies.
         Validation occurs during password creation/change operations.
-        
+
     Example:
         ```python
         login_data = LoginRequest(
@@ -244,19 +240,14 @@ class LoginRequest(BaseModel):
             password="user_password"
         )
         ```
-        
+
     Security:
         - Username length validation prevents extremely long inputs
         - Password is accepted as-is for existing user verification
         - Authentication security handled at service layer
     """
+
     username: str = Field(
-        ...,
-        min_length=3,
-        max_length=30,
-        description="Username for authentication"
+        ..., min_length=3, max_length=30, description="Username for authentication"
     )
-    password: str = Field(
-        ...,
-        description="Password for authentication"
-    )
+    password: str = Field(..., description="Password for authentication")

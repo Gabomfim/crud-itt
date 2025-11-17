@@ -31,14 +31,14 @@ License: MIT
 
 class User:
     """Simple User data model for data transfer and manipulation.
-    
+
     This class provides a basic Python representation of user data without
     database ORM functionality. It's designed for lightweight data operations,
     serialization, and business logic processing.
-    
+
     NOTE: This is separate from the SQLAlchemy User model in database.connection.
     Consider whether both models are needed or if they serve different purposes.
-    
+
     Attributes:
         username: Unique username for authentication and identification
                  Expected to be 3-30 characters, alphanumeric with underscores
@@ -47,12 +47,12 @@ class User:
         age: User age in years, expected to be positive integer 1-120
         description: Optional user profile description, max 200 characters
                     Defaults to empty string if not provided
-    
+
     Validation:
         Type hints provide basic validation, but no runtime validation is
         performed. For strict validation, use Pydantic models in models/requests.py
         and models/responses.py.
-    
+
     Usage:
         ```python
         # Create user instance
@@ -62,30 +62,30 @@ class User:
             age=25,
             description="Software developer"
         )
-        
+
         # Access attributes
         print(f"User: {user.username}, Age: {user.age}")
-        
+
         # Modify attributes
         user.description = "Senior software developer"
         ```
-    
+
     Integration:
         - Compatible with JSON serialization
         - Can be converted to/from SQLAlchemy ORM models
         - Works with Pydantic models for API serialization
         - Suitable for business logic operations
-    
+
     Security Notes:
         - Always hash passwords before storing in password field
         - Username should be validated for allowed characters
         - Consider input sanitization for description field
         - Age should be reasonable range (business logic validation)
     """
-    
+
     def __init__(self, username: str, password: str, age: int, description: str = ""):
         """Initialize User instance with provided data.
-        
+
         Args:
             username: Unique identifier for the user
             password: User password (should be pre-hashed)

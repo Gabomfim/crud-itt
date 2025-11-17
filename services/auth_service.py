@@ -25,11 +25,12 @@ License: MIT
 
 from datetime import datetime, timedelta
 from typing import Optional, Set
+
+import jwt
 from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-import jwt
 
 from config import settings
 from database.connection import User, get_db
@@ -48,7 +49,7 @@ async def authenticate_user(
 ) -> User:
     """
     Authenticate a user by username and password.
-    
+
     This function performs secure user authentication by validating
     the provided credentials against the database. It uses constant-time
     password comparison to prevent timing attacks.
@@ -62,15 +63,17 @@ async def authenticate_user(
         User: The authenticated user object with all user data
 
     Raises:
-        HTTPException: 401 Unauthorized if username doesn't exist or password is incorrect
-        
+        HTTPException: 401 Unauthorized if username doesn't exist or password
+                      is incorrect
+
     Example:
         >>> user = await authenticate_user("john_doe", "secure_password123", db)
         >>> print(user.username)  # "john_doe"
-        
+
     Security Notes:
         - Uses bcrypt for secure password verification
-        - Returns same error message for invalid username/password to prevent enumeration
+        - Returns same error message for invalid username/password to prevent
+          enumeration
         - Logs authentication attempts for security monitoring
     """
     result = await db.execute(select(User).where(User.username == username))
@@ -87,26 +90,26 @@ async def authenticate_user(
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
     """
     Create a JWT access token with configurable expiration.
-    
+
     This function generates a secure JSON Web Token containing user data
     and expiration information. The token is signed with the application's
     secret key using the configured algorithm.
-    
+
     Args:
         data (dict): Payload data to encode in the token (typically user info)
         expires_delta (Optional[timedelta]): Custom token expiration time.
             If None, uses the configured default expiration time.
-        
+
     Returns:
         str: Encoded JWT token string ready for use in Authorization headers
-        
+
     Example:
         >>> token = create_access_token({"sub": "john_doe"})
         >>> print(f"Bearer {token}")
-        
+
         >>> custom_expiry = timedelta(hours=2)
         >>> token = create_access_token({"sub": "admin"}, custom_expiry)
-        
+
     Security Notes:
         - Token includes 'iat' (issued at) claim for security tracking
         - Uses HS256 algorithm by default (configurable)
@@ -120,15 +123,15 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
         expire = datetime.utcnow() + timedelta(
             minutes=settings.security.jwt_access_token_expire_minutes
         )
-    
+
     to_encode.update({"exp": expire, "iat": datetime.utcnow()})
-    
+
     encoded_jwt = jwt.encode(
-        to_encode, 
-        settings.security.jwt_secret_key, 
-        algorithm=settings.security.jwt_algorithm
+        to_encode,
+        settings.security.jwt_secret_key,
+        algorithm=settings.security.jwt_algorithm,
     )
-    
+
     logger.info("Access token created", extra={"username": data.get("sub")})
     return encoded_jwt
 
@@ -136,17 +139,17 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
 def verify_token(token: str) -> dict:
     """
     Verify and decode a JWT token with comprehensive validation.
-    
+
     This function performs complete token validation including signature
     verification, expiration checking, blacklist verification, and payload
     validation. It ensures only valid, non-revoked tokens are accepted.
-    
+
     Args:
         token (str): JWT token string to verify and decode
-        
+
     Returns:
         dict: Decoded token payload containing user information and claims
-        
+
     Raises:
         HTTPException: 401 Unauthorized in the following cases:
             - Token is blacklisted (revoked/logged out)
@@ -154,12 +157,12 @@ def verify_token(token: str) -> dict:
             - Token has expired
             - Token is malformed
             - Token is missing required claims (subject)
-            
+
     Example:
         >>> payload = verify_token("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...")
         >>> username = payload.get("sub")
         >>> print(f"Token belongs to: {username}")
-        
+
     Security Features:
         - Blacklist checking prevents use of revoked tokens
         - Signature verification ensures token authenticity
@@ -175,14 +178,14 @@ def verify_token(token: str) -> dict:
                 detail="Token has been revoked",
                 headers={"WWW-Authenticate": "Bearer"},
             )
-            
+
         payload = jwt.decode(
-            token, 
-            settings.security.jwt_secret_key, 
-            algorithms=[settings.security.jwt_algorithm]
+            token,
+            settings.security.jwt_secret_key,
+            algorithms=[settings.security.jwt_algorithm],
         )
-        
-        username: str = payload.get("sub")
+
+        username = payload.get("sub")
         if username is None:
             logger.warning("Token missing subject")
             raise HTTPException(
@@ -190,8 +193,8 @@ def verify_token(token: str) -> dict:
                 detail="Invalid token: missing subject",
                 headers={"WWW-Authenticate": "Bearer"},
             )
-            
-        return payload
+
+        return payload  # type: ignore[no-any-return]
     except jwt.ExpiredSignatureError:
         logger.warning("Expired token used")
         raise HTTPException(
@@ -211,21 +214,21 @@ def verify_token(token: str) -> dict:
 def blacklist_token(token: str) -> None:
     """
     Add a token to the blacklist to prevent further use.
-    
+
     This function revokes a JWT token by adding it to an in-memory blacklist.
     Once blacklisted, the token cannot be used for authentication even if
     it hasn't expired. This is essential for secure logout functionality.
-    
+
     Args:
         token (str): JWT token string to revoke/blacklist
-        
+
     Returns:
         None
-        
+
     Example:
         >>> blacklist_token("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...")
         >>> # Token is now revoked and cannot be used
-        
+
     Note:
         - In production, consider using Redis or database for token blacklisting
         - Current implementation uses in-memory storage which resets on restart
@@ -238,18 +241,18 @@ def blacklist_token(token: str) -> None:
 
 async def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(security),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ) -> User:
     """
     Get the current authenticated user from JWT token.
-    
+
     Args:
         credentials: HTTP authorization credentials
         db: Database session
-        
+
     Returns:
         Current authenticated user
-        
+
     Raises:
         HTTPException: If authentication fails
     """
@@ -259,14 +262,20 @@ async def get_current_user(
             detail="Authentication required",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    
+
     token = credentials.credentials
     payload = verify_token(token)
-    username: str = payload.get("sub")
-    
+    username = payload.get("sub")
+    if not username:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token: missing subject",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
     result = await db.execute(select(User).where(User.username == username))
     user = result.scalar_one_or_none()
-    
+
     if user is None:
         logger.warning("User not found for valid token", extra={"username": username})
         raise HTTPException(
@@ -274,21 +283,21 @@ async def get_current_user(
             detail="User not found",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    
+
     return user
 
 
 async def get_current_user_optional(
     credentials: HTTPAuthorizationCredentials = Depends(security),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ) -> Optional[User]:
     """
-    Get the current authenticated user from JWT token, but don't raise if not authenticated.
-    
+    Get the current authenticated user from JWT token, optional.
+
     Args:
         credentials: HTTP authorization credentials
         db: Database session
-        
+
     Returns:
         Current authenticated user or None
     """
