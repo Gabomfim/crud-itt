@@ -1,52 +1,52 @@
-# Services Directory 🔧
+# Diretório Services 🔧
 
-This directory contains the business logic layer of the application - the "brain" that processes requests and makes decisions.
+Este diretório contém a camada de lógica de negócio da aplicação - o "cérebro" que processa requisições e toma decisões.
 
-## 🎯 Purpose
+## 🎯 Propósito
 
-The `services/` directory handles all the complex business logic, keeping it separate from the API endpoints and database operations. This makes the code more organized, testable, and maintainable.
+O diretório `services/` lida com toda a lógica de negócio complexa, mantendo-a separada dos endpoints da API e operações do banco de dados. Isso torna o código mais organizado, testável e manutenível.
 
-## 📁 Directory Structure
+## 📁 Estrutura do Diretório
 
 ```
 services/
-├── __init__.py          # Package initialization
-├── auth_service.py      # Authentication and JWT token management
-├── password_service.py  # Password hashing and verification
-└── user_service.py      # User business logic and operations
+├── __init__.py          # Inicialização do pacote
+├── auth_service.py      # Autenticação e gerenciamento de tokens JWT
+├── password_service.py  # Hash de senhas e verificação
+└── user_service.py      # Lógica de negócio e operações de usuário
 ```
 
-## 📄 File Overview
+## 📄 Visão Geral dos Arquivos
 
-### `auth_service.py` - Authentication Service
-**Purpose**: Handles user authentication, JWT tokens, and security
+### `auth_service.py` - Serviço de Autenticação
+**Propósito**: Lida com autenticação de usuário, tokens JWT e segurança
 
-**What it does**:
-- Verifies user login credentials
-- Creates JWT tokens for authenticated users
-- Validates and refreshes tokens
-- Manages token blacklisting (logout)
-- Provides user authentication for protected endpoints
+**O que faz**:
+- Verifica credenciais de login do usuário
+- Cria tokens JWT para usuários autenticados
+- Valida e renova tokens
+- Gerencia lista negra de tokens (logout)
+- Fornece autenticação de usuário para endpoints protegidos
 
-**For beginners**: Think of this as the "security guard" of your application. It checks if users are who they say they are and gives them a "pass" (JWT token) to access protected areas.
+**Para iniciantes**: Pense nisso como o "segurança" da sua aplicação. Ele verifica se os usuários são quem dizem ser e lhes dá um "passe" (token JWT) para acessar áreas protegidas.
 
-**Key Functions**:
-- `authenticate_user()` - Checks username/password
-- `create_access_token()` - Creates JWT tokens
-- `verify_token()` - Validates JWT tokens
-- `blacklist_token()` - Logs out users
-- `get_current_user()` - Gets user from token
+**Funções Principais**:
+- `authenticate_user()` - Verifica nome de usuário/senha
+- `create_access_token()` - Cria tokens JWT
+- `verify_token()` - Valida tokens JWT
+- `blacklist_token()` - Desloga usuários
+- `get_current_user()` - Obtém usuário do token
 
-### `password_service.py` - Password Security
-**Purpose**: Handles secure password hashing and verification
+### `password_service.py` - Segurança de Senhas
+**Propósito**: Lida com hash seguro de senhas e verificação
 
-**What it does**:
-- Hashes passwords using bcrypt (very secure!)
-- Verifies passwords during login
-- Uses configurable security levels
-- Protects against rainbow table attacks
+**O que faz**:
+- Faz hash de senhas usando bcrypt (muito seguro!)
+- Verifica senhas durante o login
+- Usa níveis de segurança configuráveis
+- Protege contra ataques de tabela arco-íris
 
-**For beginners**: This is like a "password safe" that scrambles passwords so they can't be read by hackers, but can still verify if a password is correct.
+**Para iniciantes**: Isso é como um "cofre de senhas" que embaralha senhas para que não possam ser lidas por hackers, mas ainda consegue verificar se uma senha está correta.
 
 **Key Functions**:
 - `hash_password()` - Converts plain password to secure hash

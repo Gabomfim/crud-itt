@@ -1,72 +1,72 @@
-# Models Directory 📋
+# Diretório Models 📋
 
-This directory contains data models that define the structure and validation rules for all data flowing through the application.
+Este diretório contém modelos de dados que definem a estrutura e regras de validação para todos os dados que fluem pela aplicação.
 
-## 🎯 Purpose
+## 🎯 Propósito
 
-The `models/` directory ensures that all data entering and leaving your API is properly formatted, validated, and secure. It acts as the "data contract" between your API and clients.
+O diretório `models/` garante que todos os dados entrando e saindo da sua API sejam adequadamente formatados, validados e seguros. Ele age como o "contrato de dados" entre sua API e os clientes.
 
-## 📁 Directory Structure
+## 📁 Estrutura do Diretório
 
 ```
 models/
-├── __init__.py          # Package initialization
-├── requests.py          # Input validation models (what comes IN)
-├── responses.py         # Output formatting models (what goes OUT)
-├── user.py             # Simple User data class (legacy)
-└── user_data.py        # Sample user data (DEPRECATED)
+├── __init__.py          # Inicialização do pacote
+├── requests.py          # Modelos de validação de entrada (o que ENTRA)
+├── responses.py         # Modelos de formatação de saída (o que SAI)
+├── user.py             # Classe simples de dados do usuário (legacy)
+└── user_data.py        # Dados de amostra do usuário (DESCONTINUADO)
 ```
 
-## 📄 File Overview
+## 📄 Visão Geral dos Arquivos
 
-### `requests.py` - Input Validation Models
-**Purpose**: Validates all data coming INTO the API from clients
+### `requests.py` - Modelos de Validação de Entrada
+**Propósito**: Valida todos os dados vindo PARA a API dos clientes
 
-**What it does**:
-- Checks if usernames are valid format
-- Validates password strength requirements
-- Ensures age is reasonable (1-120)
-- Validates description length
-- Prevents malicious input
+**O que faz**:
+- Verifica se os nomes de usuário estão em formato válido
+- Valida requisitos de força da senha
+- Garante que a idade seja razoável (1-120)
+- Valida comprimento da descrição
+- Previne entrada maliciosa
 
-**For beginners**: Think of this as a "bouncer" at a club - it checks if the data coming in meets all the requirements before letting it into your application.
+**Para iniciantes**: Pense nisso como um "segurança" de uma boate - ele verifica se os dados entrando atendem todos os requisitos antes de deixá-los entrar na sua aplicação.
 
-**Models included**:
-- `UserRequest` - For creating new users
-- `LoginRequest` - For user login
-- `PasswordChangeRequest` - For changing passwords
+**Modelos incluídos**:
+- `UserRequest` - Para criar novos usuários
+- `LoginRequest` - Para login de usuário
+- `PasswordChangeRequest` - Para alteração de senhas
 
-### `responses.py` - Output Formatting Models
-**Purpose**: Formats all data going OUT of the API to clients
+### `responses.py` - Modelos de Formatação de Saída
+**Propósito**: Formata todos os dados saindo DA API para os clientes
 
-**What it does**:
-- Formats user data for API responses
-- Excludes sensitive information (never sends passwords!)
-- Provides consistent response structure
-- Includes JWT tokens for authentication
+**O que faz**:
+- Formata dados do usuário para respostas da API
+- Exclui informações sensíveis (nunca envia senhas!)
+- Fornece estrutura de resposta consistente
+- Inclui tokens JWT para autenticação
 
-**For beginners**: This is like a "formatter" that makes sure all responses from your API look professional and consistent, like wearing a uniform.
+**Para iniciantes**: Isso é como um "formatador" que garante que todas as respostas da sua API pareçam profissionais e consistentes, como usar um uniforme.
 
-**Models included**:
-- `UserResponse` - User information without sensitive data
-- `Token` - JWT token information
-- `LoginResponse` - Complete login response with user + token
+**Modelos incluídos**:
+- `UserResponse` - Informações do usuário sem dados sensíveis
+- `Token` - Informações do token JWT
+- `LoginResponse` - Resposta completa de login com usuário + token
 
-### `user.py` - Simple User Class (Legacy)
-**Purpose**: Basic Python class for user data (older approach)
+### `user.py` - Classe Simples de Usuário (Legacy)
+**Propósito**: Classe Python básica para dados de usuário (abordagem antiga)
 
-**Status**: Legacy code - modern code uses database models and Pydantic models
+**Status**: Código legacy - código moderno usa modelos de banco de dados e modelos Pydantic
 
-**For beginners**: This is an older way of representing users. The new approach uses the database models and Pydantic validation instead.
+**Para iniciantes**: Essa é uma forma antiga de representar usuários. A nova abordagem usa os modelos de banco de dados e validação Pydantic em vez disso.
 
-### `user_data.py` - Sample Data (DEPRECATED)
-**Purpose**: Contains hardcoded sample users
+### `user_data.py` - Dados de Amostra (DESCONTINUADO)
+**Propósito**: Contém usuários de amostra hardcoded
 
-**⚠️ SECURITY WARNING**: Contains plaintext passwords - DO NOT USE in production!
+**⚠️ AVISO DE SEGURANÇA**: Contém senhas em texto plano - NÃO USE em produção!
 
-**Status**: Deprecated - use `database/init.py` instead for sample data
+**Status**: Descontinuado - use `database/init.py` em vez disso para dados de amostra
 
-## 🛡️ Data Validation Flow
+## 🛡️ Fluxo de Validação de Dados
 
 ```mermaid
 graph LR

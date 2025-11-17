@@ -1,36 +1,36 @@
-# Configuration Directory ⚙️
+# Diretório Configuration ⚙️
 
-This directory contains all application configuration and settings management.
+Este diretório contém toda a configuração da aplicação e gerenciamento de configurações.
 
-## 🎯 Purpose
+## 🎯 Propósito
 
-The `config/` directory manages how the application behaves in different environments (development, testing, production) through environment variables and settings.
+O diretório `config/` gerencia como a aplicação se comporta em diferentes ambientes (desenvolvimento, teste, produção) através de variáveis de ambiente e configurações.
 
-## 📁 Directory Structure
+## 📁 Estrutura do Diretório
 
 ```
 config/
-├── __init__.py          # Package initialization + settings export
-└── settings.py          # Main configuration management
+├── __init__.py          # Inicialização do pacote + exportação de configurações
+└── settings.py          # Gerenciamento principal de configuração
 ```
 
-## 📄 File Overview
+## 📄 Visão Geral dos Arquivos
 
-### `settings.py` - Configuration Management
-**Purpose**: Central configuration system for the entire application
+### `settings.py` - Gerenciamento de Configuração
+**Propósito**: Sistema central de configuração para toda a aplicação
 
-**What it does**:
-- Loads settings from environment variables
-- Provides default values for all settings
-- Validates configuration values
-- Organizes settings into logical categories
-- Makes configuration available throughout the app
+**O que faz**:
+- Carrega configurações de variáveis de ambiente
+- Fornece valores padrão para todas as configurações
+- Valida valores de configuração
+- Organiza configurações em categorias lógicas
+- Torna configuração disponível em toda a app
 
-**For beginners**: Think of this as the "control panel" for your app. It tells the application how to behave, where to find the database, what security settings to use, etc.
+**Para iniciantes**: Pense nisso como o "painel de controle" da sua app. Ele diz à aplicação como se comportar, onde encontrar o banco de dados, quais configurações de segurança usar, etc.
 
-## 🏗️ Configuration Categories
+## 🏗️ Categorias de Configuração
 
-### 1. Application Settings
+### 1. Configurações da Aplicação
 ```python
 app_name = "CRUD ITT"                    # App name
 app_version = "1.0.0"                    # Version number
