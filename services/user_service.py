@@ -14,19 +14,20 @@ logger = get_logger(__name__)
 async def get_user_by_username(
     username: str, db: AsyncSession = Depends(get_db)
 ) -> UserResponse:
-    """Get user information by username"""
-    logger.info("Fetching user by username", extra={"username": username})
+    """Obter informações do usuário por nome de usuário"""
+    logger.info("Buscando usuário por nome de usuário", extra={"username": username})
 
     try:
         result = await db.execute(select(User).where(User.username == username))
         user = result.scalar_one_or_none()
 
         if not user:
-            logger.warning("User not found", extra={"username": username})
-            raise HTTPException(status_code=404, detail="User not found")
+            logger.warning("Usuário não encontrado", extra={"username": username})
+            raise HTTPException(status_code=404, detail="Usuário não encontrado")
 
         logger.info(
-            "User found successfully", extra={"username": username, "user_id": user.id}
+            "Usuário encontrado com sucesso",
+            extra={"username": username, "user_id": user.id},
         )
 
         return UserResponse(
@@ -39,18 +40,20 @@ async def get_user_by_username(
         raise
     except Exception as e:
         logger.error(
-            "Error fetching user by username",
+            "Erro ao buscar usuário por nome de usuário",
             extra={"username": username, "error": str(e)},
             exc_info=True,
         )
-        raise HTTPException(status_code=500, detail="Internal server error")
+        raise HTTPException(status_code=500, detail="Erro interno do servidor")
 
 
 async def get_users_by_minimum_age(
     minimum_age: int, db: AsyncSession = Depends(get_db)
 ) -> list[UserResponse]:
-    """Get users with minimum age"""
-    logger.info("Fetching users by minimum age", extra={"minimum_age": minimum_age})
+    """Obter usuários com idade mínima"""
+    logger.info(
+        "Buscando usuários por idade mínima", extra={"minimum_age": minimum_age}
+    )
 
     try:
         result = await db.execute(select(User).where(User.age >= minimum_age))
@@ -58,14 +61,16 @@ async def get_users_by_minimum_age(
 
         if not users:
             logger.warning(
-                "No users found with minimum age", extra={"minimum_age": minimum_age}
+                "Nenhum usuário encontrado com idade mínima",
+                extra={"minimum_age": minimum_age},
             )
             raise HTTPException(
-                status_code=404, detail="No users found with the specified minimum age"
+                status_code=404,
+                detail="Nenhum usuário encontrado com a idade mínima especificada",
             )
 
         logger.info(
-            "Users found successfully",
+            "Usuários encontrados com sucesso",
             extra={"minimum_age": minimum_age, "user_count": len(users)},
         )
 
@@ -82,21 +87,21 @@ async def get_users_by_minimum_age(
         raise
     except Exception as e:
         logger.error(
-            "Error fetching users by minimum age",
+            "Erro ao buscar usuários por idade mínima",
             extra={"minimum_age": minimum_age, "error": str(e)},
             exc_info=True,
         )
-        raise HTTPException(status_code=500, detail="Internal server error")
+        raise HTTPException(status_code=500, detail="Erro interno do servidor")
 
 
 async def create_new_user(
     user_request: UserRequest, db: AsyncSession = Depends(get_db)
 ) -> dict:
-    """Create a new user"""
-    logger.info("Creating new user", extra={"username": user_request.username})
+    """Criar um novo usuário"""
+    logger.info("Criando novo usuário", extra={"username": user_request.username})
 
     try:
-        # Check if username already exists
+        # Verificar se o nome de usuário já existe
         result = await db.execute(
             select(User).where(User.username == user_request.username)
         )
@@ -104,11 +109,11 @@ async def create_new_user(
 
         if existing_user:
             logger.warning(
-                "Username already exists", extra={"username": user_request.username}
+                "Nome de usuário já existe", extra={"username": user_request.username}
             )
-            raise HTTPException(status_code=400, detail="Username already exists")
+            raise HTTPException(status_code=400, detail="Nome de usuário já existe")
 
-        # Hash the password before storing
+        # Fazer hash da senha antes de armazenar
         hashed_password = hash_password(user_request.password)
 
         new_user = User(
@@ -123,11 +128,11 @@ async def create_new_user(
         await db.refresh(new_user)
 
         logger.info(
-            "User created successfully",
+            "Usuário criado com sucesso",
             extra={"username": user_request.username, "user_id": new_user.id},
         )
 
-        return {"message": "User created successfully"}
+        return {"message": "Usuário criado com sucesso"}
 
     except HTTPException:
         raise

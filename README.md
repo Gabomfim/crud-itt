@@ -6,362 +6,362 @@
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-# CRUD ITT - User Management API
+# CRUD ITT - API de Gerenciamento de Usuários
 
-A comprehensive FastAPI application with full user management capabilities, authentication, and security features.
+Uma aplicação FastAPI abrangente com funcionalidades completas de gerenciamento de usuários, autenticação e recursos de segurança.
 
-## 🚀 Project Overview
+## 🚀 Visão Geral do Projeto
 
-This is a production-ready REST API built with FastAPI that provides complete user management functionality including:
+Esta é uma API REST pronta para produção construída com FastAPI que fornece funcionalidade completa de gerenciamento de usuários incluindo:
 
-- **User Registration & Authentication** - Secure user accounts with JWT tokens
-- **Password Management** - Secure password hashing and change functionality  
-- **User CRUD Operations** - Create, Read, Update, Delete users
-- **Security Features** - JWT authentication, password validation, rate limiting
-- **Database Integration** - Async SQLAlchemy with multiple database support
-- **Production Ready** - Logging, monitoring, Docker support, Kubernetes deployment
+- **Registro e Autenticação de Usuários** - Contas de usuário seguras com tokens JWT
+- **Gerenciamento de Senhas** - Hash seguro de senhas e funcionalidade de alteração
+- **Operações CRUD de Usuários** - Criar, Ler, Atualizar, Deletar usuários
+- **Recursos de Segurança** - Autenticação JWT, validação de senha, limitação de taxa
+- **Integração com Banco de Dados** - SQLAlchemy assíncrono com suporte a múltiplos bancos de dados
+- **Pronto para Produção** - Logging, monitoramento, suporte Docker, deploy Kubernetes
 
-## 📁 Project Structure
+## 📁 Estrutura do Projeto
 
 ```
 crud-itt/
-├── api/                    # API endpoints and routes
-├── config/                 # Application configuration
-├── database/               # Database connections and models
-├── models/                 # Data models and validation
-├── services/               # Business logic layer
-├── utils/                  # Utility functions and middleware
-├── static/                 # Static files (CSS, images)
-├── templates/              # HTML templates
-├── tests/                  # Test suite
-├── k8s/                    # Kubernetes deployment files
-├── scripts/                # Utility scripts
-├── backup/                 # Backup configurations
-├── app.py                  # Main application entry point
-└── requirements files      # Python dependencies
+├── api/                    # Endpoints da API e rotas
+├── config/                 # Configuração da aplicação
+├── database/               # Conexões e modelos do banco de dados
+├── models/                 # Modelos de dados e validação
+├── services/               # Camada de lógica de negócio
+├── utils/                  # Funções utilitárias e middleware
+├── static/                 # Arquivos estáticos (CSS, imagens)
+├── templates/              # Templates HTML
+├── tests/                  # Suíte de testes
+├── k8s/                    # Arquivos de deploy Kubernetes
+├── scripts/                # Scripts utilitários
+├── backup/                 # Configurações de backup
+├── app.py                  # Ponto de entrada principal da aplicação
+└── requirements files      # Dependências Python
 ```
 
-## 🏁 Quick Start
+## 🏁 Início Rápido
 
-### Prerequisites
+### Pré-requisitos
 - Python 3.11+
-- PostgreSQL or SQLite (for database)
-- Docker (optional, for containerized deployment)
+- PostgreSQL ou SQLite (para banco de dados)
+- Docker (opcional, para deploy containerizado)
 
-### Installation
+### Instalação
 
-1. **Clone the repository**
+1. **Clone o repositório**
    ```bash
    git clone <repository-url>
    cd crud-itt
    ```
 
-2. **Install dependencies**
+2. **Instale as dependências**
    ```bash
    pip install -r requirements.txt
    ```
 
-3. **Set up environment variables**
+3. **Configure as variáveis de ambiente**
    ```bash
    cp .env.example .env
-   # Edit .env with your configuration
+   # Edite o .env com sua configuração
    ```
 
-4. **Initialize the database**
+4. **Inicialize o banco de dados**
    ```bash
    python -m database.init
    ```
 
-5. **Run the application**
+5. **Execute a aplicação**
    ```bash
    python app.py
    ```
 
-The API will be available at `http://localhost:8000`
+A API estará disponível em `http://localhost:8000`
 
-## 📚 API Documentation
+## 📚 Documentação da API
 
-Once running, visit:
-- **Interactive API Docs**: http://localhost:8000/docs
-- **Alternative Docs**: http://localhost:8000/redoc
+Uma vez executando, visite:
+- **Documentação Interativa da API**: http://localhost:8000/docs
+- **Documentação Alternativa**: http://localhost:8000/redoc
 
-## 🔑 Authentication
+## 🔑 Autenticação
 
-The API uses JWT (JSON Web Tokens) for authentication:
+A API usa JWT (JSON Web Tokens) para autenticação:
 
-1. **Register** a new user: `POST /api/v1/users`
-2. **Login** to get token: `POST /api/v1/auth/login`  
-3. **Use token** in headers: `Authorization: Bearer <your-token>`
+1. **Registre** um novo usuário: `POST /api/v1/users`
+2. **Faça login** para obter token: `POST /api/v1/auth/login`  
+3. **Use o token** nos cabeçalhos: `Authorization: Bearer <seu-token>`
 
-## 🗂️ Directory Guide
+## 🗂️ Guia de Diretórios
 
-Each directory contains a detailed README explaining its purpose:
+Cada diretório contém um README detalhado explicando seu propósito:
 
-- [`api/`](api/README.md) - API endpoints and routing
-- [`config/`](config/README.md) - Configuration management
-- [`database/`](database/README.md) - Database connections and ORM
-- [`models/`](models/README.md) - Data validation models
-- [`services/`](services/README.md) - Business logic layer
-- [`utils/`](utils/README.md) - Utilities and middleware
-- [`tests/`](tests/README.md) - Test suite
-- [`k8s/`](k8s/README.md) - Kubernetes deployment
-- [`static/`](static/README.md) - Static web assets
-- [`templates/`](templates/README.md) - HTML templates
-- [`scripts/`](scripts/README.md) - Utility scripts
+- [`api/`](api/README.md) - Endpoints da API e roteamento
+- [`config/`](config/README.md) - Gerenciamento de configuração
+- [`database/`](database/README.md) - Conexões do banco de dados e ORM
+- [`models/`](models/README.md) - Modelos de validação de dados
+- [`services/`](services/README.md) - Camada de lógica de negócio
+- [`utils/`](utils/README.md) - Utilitários e middleware
+- [`tests/`](tests/README.md) - Suíte de testes
+- [`k8s/`](k8s/README.md) - Deploy Kubernetes
+- [`static/`](static/README.md) - Assets web estáticos
+- [`templates/`](templates/README.md) - Templates HTML
+- [`scripts/`](scripts/README.md) - Scripts utilitários
 
-## 🛠️ Key Features
+## 🛠️ Principais Recursos
 
-### Security
-- ✅ JWT token authentication
-- ✅ Bcrypt password hashing
-- ✅ Input validation and sanitization
-- ✅ SQL injection prevention
-- ✅ CORS configuration
-- ✅ Rate limiting ready
+### Segurança
+- ✅ Autenticação com token JWT
+- ✅ Hash de senha com Bcrypt
+- ✅ Validação e sanitização de entrada
+- ✅ Prevenção de injeção SQL
+- ✅ Configuração CORS
+- ✅ Limitação de taxa pronta
 
 ### Performance
-- ✅ Async/await throughout
-- ✅ Database connection pooling
-- ✅ Efficient query patterns
-- ✅ Request/response caching
-- ✅ Structured logging
+- ✅ Async/await em toda parte
+- ✅ Pool de conexões do banco de dados
+- ✅ Padrões de consulta eficientes
+- ✅ Cache de requisição/resposta
+- ✅ Logging estruturado
 
-### Development
-- ✅ Comprehensive test suite
-- ✅ Docker containerization
-- ✅ Kubernetes deployment
-- ✅ Environment-based configuration
-- ✅ Code documentation
-- ✅ Type hints throughout
+### Desenvolvimento
+- ✅ Suíte de testes abrangente
+- ✅ Containerização Docker
+- ✅ Deploy Kubernetes
+- ✅ Configuração baseada em ambiente
+- ✅ Documentação do código
+- ✅ Type hints em toda parte
 
-## 🧪 Testing
+## 🧪 Testes
 
-Run the test suite:
+Execute a suíte de testes:
 ```bash
-# Run all tests
+# Execute todos os testes
 python -m pytest
 
-# Run with coverage
+# Execute com cobertura
 python -m pytest --cov=.
 
-# Run specific test file
+# Execute arquivo de teste específico
 python -m pytest tests/test_auth.py
 ```
 
-## 🐳 Docker Deployment
+## 🐳 Deploy Docker
 
-Build and run with Docker:
+Construa e execute com Docker:
 ```bash
-# Build image
+# Construir imagem
 docker build -t crud-itt .
 
-# Run container
+# Executar container
 docker run -p 8000:8000 crud-itt
 
-# Or use docker-compose
+# Ou use docker-compose
 docker-compose up
 ```
 
-## ☸️ Kubernetes Deployment
+## ☸️ Deploy Kubernetes
 
-Deploy to Kubernetes:
+Deploy no Kubernetes:
 ```bash
-# Apply all configurations
+# Aplicar todas as configurações
 kubectl apply -k k8s/
 
-# Check deployment status
+# Verificar status do deployment
 kubectl get pods -n crud-itt
 ```
 
-## 📝 Environment Configuration
+## 📝 Configuração de Ambiente
 
-Key environment variables:
+Principais variáveis de ambiente:
 
 ```bash
-# Application
+# Aplicação
 APP_NAME=CRUD ITT
 APP_ENVIRONMENT=development
 APP_DEBUG=false
 
-# Database
+# Banco de Dados
 DATABASE_URL=sqlite+aiosqlite:///./database/users.db
 
-# Security
-JWT_SECRET_KEY=your-secret-key-here
-SECURITY_SECRET_KEY=your-app-secret-here
+# Segurança
+JWT_SECRET_KEY=sua-chave-secreta-aqui
+SECURITY_SECRET_KEY=seu-app-secret-aqui
 
-# Server
+# Servidor
 SERVER_HOST=0.0.0.0
 SERVER_PORT=8000
 ```
 
-## 🚀 Deployment Workflows
+## 🚀 Workflows de Deploy
 
-This project includes automated deployment workflows for staging and production environments:
+Este projeto inclui workflows automatizados de deploy para ambientes de staging e produção:
 
-### Staging Deployment
-- **Trigger**: Push to `staging` branch
-- **Environment**: `crud-itt-staging` namespace
-- **Features**: 
-  - Automated testing
-  - Docker image build and push
-  - Kubernetes deployment
-  - Health checks
-  - Slack notifications
+### Deploy de Staging
+- **Trigger**: Push para branch `staging`
+- **Ambiente**: namespace `crud-itt-staging`
+- **Recursos**: 
+  - Testes automatizados
+  - Build e push da imagem Docker
+  - Deploy Kubernetes
+  - Verificações de saúde
+  - Notificações Slack
 
-### Production Deployment  
-- **Trigger**: Push to `main` branch
-- **Environment**: `crud-itt` namespace
-- **Features**:
-  - Comprehensive testing and security scanning
-  - Staging environment verification
-  - Blue-green deployment
-  - Automatic rollback on failure
-  - Health checks and smoke tests
-  - Multi-level notifications
+### Deploy de Produção  
+- **Trigger**: Push para branch `main`
+- **Ambiente**: namespace `crud-itt`
+- **Recursos**:
+  - Testes abrangentes e escaneamento de segurança
+  - Verificação do ambiente de staging
+  - Deploy blue-green
+  - Rollback automático em caso de falha
+  - Verificações de saúde e smoke tests
+  - Notificações multi-nível
 
-### Manual Deployment
-Both workflows support manual triggering with additional options:
-- `force_deploy`: Skip tests and deploy anyway
-- `skip_staging_check`: (Production only) Skip staging verification
+### Deploy Manual
+Ambos workflows suportam trigger manual com opções adicionais:
+- `force_deploy`: Pular testes e fazer deploy mesmo assim
+- `skip_staging_check`: (Somente produção) Pular verificação de staging
 
-## 📋 Deployment Requirements
+## 📋 Requisitos de Deploy
 
-Before using the deployment workflows, ensure you have:
+Antes de usar os workflows de deploy, certifique-se que você tem:
 
-1. **GitHub Secrets configured** (see [DEPLOYMENT.md](DEPLOYMENT.md))
-2. **Kubernetes clusters** set up for staging and production
-3. **Container registry** access (GitHub Container Registry)
-4. **Database** instances configured for each environment
+1. **GitHub Secrets configurados** (veja [DEPLOYMENT.md](DEPLOYMENT.md))
+2. **Clusters Kubernetes** configurados para staging e produção
+3. **Acesso ao registry de containers** (GitHub Container Registry)
+4. **Instâncias de banco de dados** configuradas para cada ambiente
 
-For detailed setup instructions, see the [Deployment Guide](DEPLOYMENT.md).
+Para instruções detalhadas de configuração, veja o [Guia de Deploy](DEPLOYMENT.md).
 
-## 🔧 Environment Configuration
+## 🔧 Configuração de Ambiente
 
-The application uses Pydantic settings for type-safe environment variable management:
+A aplicação usa configurações Pydantic para gerenciamento type-safe de variáveis de ambiente:
 
 ```python
 from config import settings
 
-# Application settings
+# Configurações da aplicação
 print(f"App: {settings.app.name} v{settings.app.version}")
-print(f"Environment: {settings.app.environment}")
+print(f"Ambiente: {settings.app.environment}")
 
-# Database settings  
-print(f"Database URL: {settings.database.url}")
+# Configurações do banco de dados  
+print(f"URL do Banco de Dados: {settings.database.url}")
 
-# Security settings
-print(f"BCrypt rounds: {settings.security.bcrypt_rounds}")
+# Configurações de segurança
+print(f"Rounds BCrypt: {settings.security.bcrypt_rounds}")
 ```
 
-See `config/settings.py` for all available configuration options.
+Veja `config/settings.py` para todas as opções de configuração disponíveis.
 
-## 📊 Health Monitoring
+## 📊 Monitoramento de Saúde
 
-The application includes built-in health monitoring:
+A aplicação inclui monitoramento de saúde integrado:
 
-- **Health Endpoint**: `GET /health`
-- **Kubernetes Probes**: Liveness and readiness checks
-- **Logging**: Structured logging with configurable levels
-- **Metrics**: Integration-ready for monitoring tools
+- **Endpoint de Saúde**: `GET /health`
+- **Probes Kubernetes**: Verificações de liveness e readiness
+- **Logging**: Logging estruturado com níveis configuráveis
+- **Métricas**: Pronto para integração com ferramentas de monitoramento
 
-## 🔐 Security Features
+## 🔐 Recursos de Segurança
 
-- **Password Security**: Configurable complexity requirements
-- **BCrypt Hashing**: Environment-specific round counts
-- **Secret Management**: Kubernetes secrets integration
-- **Container Security**: Non-root user, minimal privileges
-- **Vulnerability Scanning**: Automated Trivy scans in CI/CD
+- **Segurança de Senha**: Requisitos de complexidade configuráveis
+- **Hash BCrypt**: Contagens de rounds específicas por ambiente
+- **Gerenciamento de Secrets**: Integração com secrets Kubernetes
+- **Segurança de Container**: Usuário não-root, privilégios mínimos
+- **Escaneamento de Vulnerabilidades**: Scans automatizados Trivy no CI/CD
 
-## 📚 API Endpoints
+## 📚 Endpoints da API
 
-### Authentication
+### Autenticação
 
-- **POST** `/api/v1/auth/login` - Login and receive JWT token
-- **POST** `/api/v1/auth/logout` - Logout and blacklist token  
-- **GET** `/api/v1/auth/me` - Get current user information
+- **POST** `/api/v1/auth/login` - Login e receber token JWT
+- **POST** `/api/v1/auth/logout` - Logout e colocar token na blacklist  
+- **GET** `/api/v1/auth/me` - Obter informações do usuário atual
 
-#### Login Request
+#### Requisição de Login
 ```json
 {
-  "username": "your_username",
-  "password": "your_password"
+  "username": "seu_usuario",
+  "password": "sua_senha"
 }
 ```
 
-#### Login Response
+#### Resposta de Login
 ```json
 {
   "user": {
     "id": 1,
-    "username": "your_username",
+    "username": "seu_usuario",
     "age": 25,
-    "description": "User description"
+    "description": "Descrição do usuário"
   },
   "token": {
     "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
     "token_type": "bearer",
     "expires_in": 1800
   },
-  "message": "Login successful"
+  "message": "Login realizado com sucesso"
 }
 ```
 
-### User Management (🔒 Authentication Required)
+### Gerenciamento de Usuários (🔒 Autenticação Obrigatória)
 
-- **GET** `/api/v1/users/{username}` - Get user information
-- **GET** `/api/v1/users?minimum_age={age}` - Get users by minimum age
-- **POST** `/api/v1/users` - Create a new user (⚠️ Public endpoint)
-- **PUT** `/api/v1/users/{username}` - Update user information
-- **DELETE** `/api/v1/users/{username}` - Delete a user
+- **GET** `/api/v1/users/{username}` - Obter informações do usuário
+- **GET** `/api/v1/users?minimum_age={age}` - Obter usuários por idade mínima
+- **POST** `/api/v1/users` - Criar um novo usuário (⚠️ Endpoint público)
+- **PUT** `/api/v1/users/{username}` - Atualizar informações do usuário
+- **DELETE** `/api/v1/users/{username}` - Deletar um usuário
 
-### Password Management (🔒 Authentication Required)
+### Gerenciamento de Senhas (🔒 Autenticação Obrigatória)
 
-- **PUT** `/api/v1/users/{username}/password` - Change user password
+- **PUT** `/api/v1/users/{username}/password` - Alterar senha do usuário
 
-#### Change Password Request
+#### Requisição de Alteração de Senha
 ```json
 {
-  "current_password": "current_password",
-  "new_password": "new_secure_password",
-  "confirm_password": "new_secure_password"
+  "current_password": "senha_atual",
+  "new_password": "nova_senha_segura",
+  "confirm_password": "nova_senha_segura"
 }
 ```
 
-**Requirements:**
-- Current password must be correct
-- New password must meet complexity requirements (configurable)
-- New password must be different from current password
-- Password confirmation must match new password
+**Requisitos:**
+- Senha atual deve estar correta
+- Nova senha deve atender aos requisitos de complexidade (configurável)
+- Nova senha deve ser diferente da senha atual
+- Confirmação de senha deve coincidir com a nova senha
 
-**Response:**
+**Resposta:**
 ```json
 {
-  "message": "Password changed successfully"
+  "message": "Senha alterada com sucesso"
 }
 ```
 
-### Authentication Headers
+### Cabeçalhos de Autenticação
 
-For protected endpoints, include the JWT token in the Authorization header:
+Para endpoints protegidos, inclua o token JWT no cabeçalho Authorization:
 
 ```bash
-Authorization: Bearer your_jwt_token_here
+Authorization: Bearer seu_jwt_token_aqui
 ```
 
-### Example Usage
+### Exemplo de Uso
 
 ```bash
-# 1. Login to get token
+# 1. Login para obter token
 curl -X POST "http://localhost:8000/api/v1/auth/login" \
   -H "Content-Type: application/json" \
   -d '{"username": "testuser", "password": "TestPassword123!"}'
 
-# 2. Use token for protected endpoints
+# 2. Use token para endpoints protegidos
 curl -X GET "http://localhost:8000/api/v1/users/testuser" \
-  -H "Authorization: Bearer your_jwt_token_here"
+  -H "Authorization: Bearer seu_jwt_token_aqui"
 
-# 3. Logout to blacklist token
+# 3. Logout para colocar token na blacklist
 curl -X POST "http://localhost:8000/api/v1/auth/logout" \
-  -H "Authorization: Bearer your_jwt_token_here"
+  -H "Authorization: Bearer seu_jwt_token_aqui"
 ```

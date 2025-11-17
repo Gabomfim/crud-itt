@@ -1,20 +1,20 @@
 """
-FastAPI Application Entry Point
+Ponto de Entrada da Aplicação FastAPI
 
-This module contains the main FastAPI application configuration and setup.
-It initializes the database, configures middleware, sets up routing, and
-handles application lifecycle events.
+Este módulo contém a configuração e setup principal da aplicação FastAPI.
+Ele inicializa o banco de dados, configura middleware, configura roteamento, e
+gerencia eventos do ciclo de vida da aplicação.
 
-Key Features:
-- Async database initialization
-- CORS middleware configuration
-- Request logging and health check middleware
-- Static file serving and HTML template rendering
-- Custom 404 error handling
-- Comprehensive logging setup
+Recursos Principais:
+- Inicialização assíncrona do banco de dados
+- Configuração de middleware CORS
+- Logging de requisições e middleware de verificação de saúde
+- Servir arquivos estáticos e renderização de templates HTML
+- Tratamento customizado de erro 404
+- Setup abrangente de logging
 
-Author: Gabomfim
-License: MIT
+Autor: Gabomfim
+Licença: MIT
 """
 
 from contextlib import asynccontextmanager
@@ -38,13 +38,13 @@ from utils.middleware import HealthCheckMiddleware, RequestLoggingMiddleware
 def render_template(
     request: Request, template_name: str, status_code: int = 200
 ) -> _TemplateResponse:
-    """Helper function to render templates with proper typing"""
+    """Função auxiliar para renderizar templates com tipagem adequada"""
     return templates.TemplateResponse(
         request, template_name, status_code=status_code
     )  # type: ignore
 
 
-# Setup logging using Pydantic settings
+# Configurar logging usando configurações Pydantic
 setup_logging(app_name=settings.app.name)
 
 logger = get_logger(__name__)
@@ -53,43 +53,45 @@ logger = get_logger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """
-    Manage the application lifecycle with startup and shutdown events.
+    Gerenciar o ciclo de vida da aplicação com eventos de startup e shutdown.
 
-    This function handles database initialization on startup and cleanup
-    on shutdown. It uses an async context manager to ensure proper
-    resource management.
+    Esta função trata da inicialização do banco de dados no startup e limpeza
+    no shutdown. Ela usa um gerenciador de contexto assíncrono para garantir
+    gerenciamento adequado de recursos.
 
     Args:
-        app (FastAPI): The FastAPI application instance
+        app (FastAPI): A instância da aplicação FastAPI
 
     Yields:
-        None: Control is yielded during application runtime
+        None: O controle é cedido durante a execução da aplicação
 
     Raises:
-        Exception: Any exception during database initialization
+        Exception: Qualquer exceção durante a inicialização do banco de dados
 
     Example:
-        This function is automatically called by FastAPI during
-        application startup and shutdown.
+        Esta função é automaticamente chamada pelo FastAPI durante
+        o startup e shutdown da aplicação.
     """
-    # Log application startup
-    logger.info("Application starting up")
+    # Logar startup da aplicação
+    logger.info("Aplicação iniciando")
 
     try:
-        # Initialize database on startup
+        # Inicializar banco de dados no startup
         await init_database()
-        logger.info("Database initialized successfully")
+        logger.info("Banco de dados inicializado com sucesso")
     except Exception as e:
         logger.error(
-            "Failed to initialize database", extra={"error": str(e)}, exc_info=True
+            "Falha ao inicializar banco de dados",
+            extra={"error": str(e)},
+            exc_info=True,
         )
         raise
 
-    logger.info("Application startup completed")
+    logger.info("Startup da aplicação completado")
     yield
 
-    # Log application shutdown
-    logger.info("Application shutting down")
+    # Logar shutdown da aplicação
+    logger.info("Aplicação desligando")
 
 
 app = FastAPI(
@@ -100,7 +102,7 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# Add CORS middleware
+# Adicionar middleware CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.app.cors_origins,
@@ -109,88 +111,89 @@ app.add_middleware(
     allow_headers=settings.app.cors_headers,
 )
 
-# Add logging middleware
+# Adicionar middleware de logging
 app.add_middleware(RequestLoggingMiddleware, exclude_paths=["/health", "/metrics"])
 app.add_middleware(HealthCheckMiddleware, health_path="/health")
 
-# Mount static files
+# Montar arquivos estáticos
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-# Setup templates
+# Configurar templates
 templates = Jinja2Templates(directory="templates")
 
-# Include API v1 routes
+# Incluir rotas da API v1
 app.include_router(api_router, prefix="/api/v1")
 
 
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request) -> StarletteResponse:
     """
-    Serve the root HTML page of the application.
+    Servir a página HTML raiz da aplicação.
 
-    This endpoint serves the main landing page using Jinja2 templates.
-    It provides a user-friendly interface with application information
-    and navigation links.
+    Este endpoint serve a página principal usando templates Jinja2.
+    Ele fornece uma interface amigável com informações da aplicação
+    e links de navegação.
 
     Args:
-        request (Request): The FastAPI request object containing client information
+        request (Request): O objeto de requisição FastAPI contendo informações do
+            cliente
 
     Returns:
-        StarletteResponse: Rendered HTML template with application content
+        StarletteResponse: Template HTML renderizado com conteúdo da aplicação
 
     Example:
         GET / HTTP/1.1
         Host: localhost:8000
 
-        Response: HTML page with application interface
+        Response: Página HTML com interface da aplicação
     """
-    logger.info("Serving root page")
+    logger.info("Servindo página raiz")
     return render_template(request, "index.html")
 
 
-# Custom error handler for non-API 404s only
+# Manipulador de erro customizado apenas para 404s não-API
 @app.middleware("http")
 async def custom_404_middleware(
     request: Request, call_next: Callable[[Request], Any]
 ) -> Response:
     """
-    Custom middleware to handle 404 errors with HTML responses.
+    Middleware customizado para tratar erros 404 com respostas HTML.
 
-    This middleware intercepts 404 errors and returns a custom HTML
-    error page when the client accesses non-API routes. For API requests,
-    it lets the default JSON error response through.
+    Este middleware intercepta erros 404 e retorna uma página HTML
+    de erro customizada quando o cliente acessa rotas não-API. Para requisições de API,
+    ele deixa a resposta JSON de erro padrão passar.
 
     Args:
-        request (Request): The incoming HTTP request
-        call_next (Callable): The next middleware or endpoint in the chain
+        request (Request): A requisição HTTP de entrada
+        call_next (Callable): O próximo middleware ou endpoint na cadeia
 
     Returns:
-        Response: Either the original response or custom 404 HTML page
+        Response: Ou a resposta original ou página HTML 404 customizada
 
     Raises:
-        Exception: Re-raises any unhandled exceptions after logging
+        Exception: Re-levanta qualquer exceção não tratada após logar
 
     Example:
         GET /nonexistent-page HTTP/1.1
         Accept: text/html
 
-        Response: Custom 404 HTML page
+        Response: Página HTML 404 customizada
     """
     try:
         response = await call_next(request)
-        # If it's a 404 on a non-API route, return custom HTML page
+        # Se é um 404 em uma rota não-API, retornar página HTML customizada
         if response.status_code == 404 and not request.url.path.startswith("/api/"):
             logger.info(
-                "Serving custom 404 page",
+                "Servindo página 404 customizada",
                 extra={"path": request.url.path, "method": request.method},
             )
             return render_template(request, "404.html", status_code=404)
         return response  # type: ignore
     except Exception as e:
         logger.error(
-            "Unhandled exception in middleware",
+            "Exceção não tratada no middleware",
             extra={"path": request.url.path, "method": request.method, "error": str(e)},
             exc_info=True,
         )
-        # Let FastAPI handle all exceptions normally
+        # Deixar FastAPI tratar todas as exceções normalmente
         raise e

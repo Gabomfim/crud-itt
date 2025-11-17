@@ -1,72 +1,72 @@
-# API Directory 📡
+# Diretório API 📡
 
-This directory contains the API layer of the application, organizing all REST endpoints and routing logic.
+Este diretório contém a camada de API da aplicação, organizando todos os endpoints REST e lógica de roteamento.
 
-## 🎯 Purpose
+## 🎯 Propósito
 
-The `api/` directory handles all HTTP requests and responses, serving as the interface between external clients and the application's business logic.
+O diretório `api/` trata todas as requisições e respostas HTTP, servindo como interface entre clientes externos e a lógica de negócio da aplicação.
 
-## 📁 Directory Structure
+## 📁 Estrutura do Diretório
 
 ```
 api/
-├── __init__.py          # Package initialization
-└── v1/                  # API version 1
-    ├── __init__.py      # Version package initialization
-    ├── api.py           # Main API router configuration
-    ├── auth_routes.py   # Authentication endpoints
-    └── user_routes.py   # User management endpoints
+├── __init__.py          # Inicialização do pacote
+└── v1/                  # API versão 1
+    ├── __init__.py      # Inicialização do pacote de versão
+    ├── api.py           # Configuração do roteador principal da API
+    ├── auth_routes.py   # Endpoints de autenticação
+    └── user_routes.py   # Endpoints de gerenciamento de usuário
 ```
 
-## 📄 File Overview
+## 📄 Visão Geral dos Arquivos
 
-### `v1/api.py` - Main API Router
-**Purpose**: Central router that combines all API endpoints
+### `v1/api.py` - Roteador Principal da API
+**Propósito**: Roteador central que combina todos os endpoints da API
 
-**What it does**:
-- Creates the main API router for version 1
-- Includes authentication routes (`/auth`)
-- Includes user management routes (`/users`)  
-- Provides a single entry point for all API endpoints
+**O que faz**:
+- Cria o roteador principal da API para versão 1
+- Inclui rotas de autenticação (`/auth`)
+- Inclui rotas de gerenciamento de usuário (`/users`)  
+- Fornece um ponto único de entrada para todos os endpoints da API
 
-**For beginners**: Think of this as the "traffic director" that decides which endpoint handles which request.
+**Para iniciantes**: Pense nisso como o "diretor de trânsito" que decide qual endpoint trata qual requisição.
 
-### `v1/auth_routes.py` - Authentication Endpoints
-**Purpose**: Handles user login, logout, and authentication
+### `v1/auth_routes.py` - Endpoints de Autenticação
+**Propósito**: Trata login, logout e autenticação de usuário
 
-**Available endpoints**:
-- `POST /auth/login` - User login with username/password
-- `POST /auth/logout` - User logout (invalidates token)
-- `GET /auth/me` - Get current user information
+**Endpoints disponíveis**:
+- `POST /auth/login` - Login de usuário com nome de usuário/senha
+- `POST /auth/logout` - Logout de usuário (invalida token)
+- `GET /auth/me` - Obter informações do usuário atual
 
-**What it does**:
-- Validates user credentials
-- Creates JWT tokens for authentication
-- Manages token blacklisting for security
-- Returns user information for authenticated users
+**O que faz**:
+- Valida credenciais do usuário
+- Cria tokens JWT para autenticação
+- Gerencia blacklist de tokens para segurança
+- Retorna informações do usuário para usuários autenticados
 
-**For beginners**: This is where users "sign in" to use the app. It checks if the password is correct and gives them a "ticket" (JWT token) to access protected features.
+**Para iniciantes**: É aqui que os usuários "fazem login" para usar o app. Verifica se a senha está correta e dá a eles um "ingresso" (token JWT) para acessar recursos protegidos.
 
-### `v1/user_routes.py` - User Management Endpoints
-**Purpose**: Handles all user-related operations (CRUD)
+### `v1/user_routes.py` - Endpoints de Gerenciamento de Usuário
+**Propósito**: Trata todas as operações relacionadas ao usuário (CRUD)
 
-**Available endpoints**:
-- `POST /users` - Create new user account
-- `GET /users/{username}` - Get user information
-- `PUT /users/{username}` - Update user profile
-- `DELETE /users/{username}` - Delete user account
-- `PUT /users/{username}/password` - Change user password
+**Endpoints disponíveis**:
+- `POST /users` - Criar nova conta de usuário
+- `GET /users/{username}` - Obter informações do usuário
+- `PUT /users/{username}` - Atualizar perfil do usuário
+- `DELETE /users/{username}` - Deletar conta do usuário
+- `PUT /users/{username}/password` - Alterar senha do usuário
 
-**What it does**:
-- Creates new user accounts
-- Retrieves user profiles
-- Updates user information
-- Deletes user accounts
-- Handles password changes securely
+**O que faz**:
+- Cria novas contas de usuário
+- Recupera perfis de usuário
+- Atualiza informações do usuário
+- Deleta contas de usuário
+- Trata mudanças de senha de forma segura
 
-**For beginners**: This is like a "user manager" that lets you create accounts, view profiles, update information, and delete accounts.
+**Para iniciantes**: É como um "gerenciador de usuário" que permite criar contas, visualizar perfis, atualizar informações e deletar contas.
 
-## 🔑 Authentication Flow
+## 🔑 Fluxo de Autenticação
 
 ```mermaid
 sequenceDiagram
@@ -76,70 +76,70 @@ sequenceDiagram
     participant Database
 
     Client->>AuthAPI: POST /auth/login
-    AuthAPI->>Database: Verify credentials
-    Database-->>AuthAPI: User validated
-    AuthAPI-->>Client: JWT token
+    AuthAPI->>Database: Verificar credenciais
+    Database-->>AuthAPI: Usuário validado
+    AuthAPI-->>Client: Token JWT
 
-    Client->>UserAPI: GET /users/me (with token)
-    UserAPI->>AuthAPI: Validate token
-    AuthAPI-->>UserAPI: Token valid
-    UserAPI->>Database: Get user data
-    Database-->>UserAPI: User data
-    UserAPI-->>Client: User information
+    Client->>UserAPI: GET /users/me (com token)
+    UserAPI->>AuthAPI: Validar token
+    AuthAPI-->>UserAPI: Token válido
+    UserAPI->>Database: Obter dados do usuário
+    Database-->>UserAPI: Dados do usuário
+    UserAPI-->>Client: Informações do usuário
 ```
 
-## 🛡️ Security Features
+## 🛡️ Recursos de Segurança
 
-### Authentication Required
-Most endpoints require authentication:
+### Autenticação Obrigatória
+A maioria dos endpoints requer autenticação:
 ```python
-# Protected endpoint example
+# Exemplo de endpoint protegido
 @router.get("/users/{username}")
 async def get_user(
     username: str,
-    current_user: User = Depends(get_current_user)  # ← Authentication required
+    current_user: User = Depends(get_current_user)  # ← Autenticação obrigatória
 ):
 ```
 
-### Input Validation
-All inputs are validated using Pydantic models:
+### Validação de Entrada
+Todas as entradas são validadas usando modelos Pydantic:
 ```python
-# Request validation
+# Validação de requisição
 @router.post("/users")
-async def create_user(user_data: UserRequest):  # ← Validates input automatically
+async def create_user(user_data: UserRequest):  # ← Valida entrada automaticamente
 ```
 
-### Error Handling
-Consistent error responses:
-- `400` - Bad Request (invalid input)
-- `401` - Unauthorized (no token or invalid token)
-- `403` - Forbidden (valid token, but no permission)
-- `404` - Not Found (user doesn't exist)
-- `409` - Conflict (username already exists)
+### Tratamento de Erros
+Respostas de erro consistentes:
+- `400` - Requisição Inválida (entrada inválida)
+- `401` - Não Autorizado (sem token ou token inválido)
+- `403` - Proibido (token válido, mas sem permissão)
+- `404` - Não Encontrado (usuário não existe)
+- `409` - Conflito (nome de usuário já existe)
 
-## 🧩 How It Connects
+## 🧩 Como Se Conecta
 
-### Input Flow
+### Fluxo de Entrada
 ```
-HTTP Request → FastAPI → API Router → Endpoint Function → Service Layer → Database
-```
-
-### Response Flow
-```
-Database → Service Layer → Endpoint Function → Pydantic Model → JSON Response
+Requisição HTTP → FastAPI → Roteador API → Função Endpoint → Camada de Serviço → Banco de Dados
 ```
 
-## 📝 Usage Examples
+### Fluxo de Resposta
+```
+Banco de Dados → Camada de Serviço → Função Endpoint → Modelo Pydantic → Resposta JSON
+```
 
-### Creating a User
+## 📝 Exemplos de Uso
+
+### Criando um Usuário
 ```bash
 curl -X POST "http://localhost:8000/api/v1/users" \
   -H "Content-Type: application/json" \
   -d '{
-    "username": "johndoe",
-    "password": "SecurePass123!",
+    "username": "joaosilva",
+    "password": "SenhaSegura123!",
     "age": 25,
-    "description": "Software developer"
+    "description": "Desenvolvedor de software"
   }'
 ```
 

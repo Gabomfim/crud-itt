@@ -1,100 +1,100 @@
-# Testing Guide
+# Guia de Testes
 
-## Overview
-This application includes comprehensive tests covering:
-- **Models**: Pydantic validation testing
-- **API Endpoints**: FastAPI route testing  
-- **Services**: Business logic testing
-- **Integration**: End-to-end functionality
+## Visão Geral
+Esta aplicação inclui testes abrangentes cobrindo:
+- **Modelos**: Testes de validação Pydantic
+- **Endpoints da API**: Testes de rotas FastAPI  
+- **Serviços**: Testes de lógica de negócio
+- **Integração**: Funcionalidade end-to-end
 
-## Test Structure
+## Estrutura dos Testes
 ```
 tests/
-├── __init__.py          # Test package
-├── conftest.py          # Test configuration & fixtures
-├── test_models.py       # Pydantic model tests
-├── test_api.py          # API endpoint tests
-└── test_services.py     # Service layer tests
+├── __init__.py          # Pacote de testes
+├── conftest.py          # Configuração de testes e fixtures
+├── test_models.py       # Testes de modelos Pydantic
+├── test_api.py          # Testes de endpoints da API
+└── test_services.py     # Testes da camada de serviço
 ```
 
-## Running Tests
+## Executando Testes
 
-### Install Test Dependencies
+### Instalar Dependências de Teste
 ```bash
 pip install -r requirements.txt
 ```
 
-### Run All Tests
+### Executar Todos os Testes
 ```bash
 pytest
 ```
 
-### Run Specific Test Files
+### Executar Arquivos de Teste Específicos
 ```bash
-pytest tests/test_models.py     # Model validation tests
-pytest tests/test_api.py        # API endpoint tests
-pytest tests/test_services.py   # Service layer tests
+pytest tests/test_models.py     # Testes de validação de modelos
+pytest tests/test_api.py        # Testes de endpoints da API
+pytest tests/test_services.py   # Testes da camada de serviço
 ```
 
-### Run with Verbose Output
+### Executar com Saída Verbosa
 ```bash
 pytest -v
 ```
 
-### Run with Coverage
+### Executar com Cobertura
 ```bash
 pip install pytest-cov
 pytest --cov=. --cov-report=html
 ```
 
-## Pytest Warning Management
+## Gerenciamento de Avisos do Pytest
 
-### Configuration Overview
+### Visão Geral da Configuração
 
-The pytest configuration is defined in `pyproject.toml` with comprehensive warning management:
+A configuração do pytest é definida em `pyproject.toml` com gerenciamento abrangente de avisos:
 
 ```toml
 [tool.pytest.ini_options]
 filterwarnings = [
-    "error::DeprecationWarning",                    # Treat deprecation warnings as errors
-    "error::PendingDeprecationWarning",             # Treat pending deprecation warnings as errors
-    "ignore::DeprecationWarning:pkg_resources.*",   # Ignore pkg_resources deprecations
-    "ignore::DeprecationWarning:distutils.*",       # Ignore distutils deprecations
-    "ignore::DeprecationWarning:urllib3.*",         # Ignore urllib3 deprecations
-    "ignore::UserWarning:anyio.*",                  # Ignore anyio user warnings
-    "ignore::RuntimeWarning:asyncio.*"              # Ignore asyncio runtime warnings
+    "error::DeprecationWarning",                    # Tratar avisos de depreciação como erros
+    "error::PendingDeprecationWarning",             # Tratar avisos de depreciação pendente como erros
+    "ignore::DeprecationWarning:pkg_resources.*",   # Ignorar depreciações pkg_resources
+    "ignore::DeprecationWarning:distutils.*",       # Ignorar depreciações distutils
+    "ignore::DeprecationWarning:urllib3.*",         # Ignorar depreciações urllib3
+    "ignore::UserWarning:anyio.*",                  # Ignorar avisos de usuário anyio
+    "ignore::RuntimeWarning:asyncio.*"              # Ignorar avisos de runtime asyncio
 ]
-asyncio_mode = "auto"                               # Auto-handle async tests
+asyncio_mode = "auto"                               # Tratar testes async automaticamente
 ```
 
-### Warning Resolution History
+### Histórico de Resolução de Avisos
 
-#### Pydantic V2 Migration ✅
-- **Issue**: `PydanticDeprecatedSince20` warnings for class-based config
-- **Solution**: Updated `models/responses.py` to use `ConfigDict`:
+#### Migração Pydantic V2 ✅
+- **Problema**: Avisos `PydanticDeprecatedSince20` para config baseada em classe
+- **Solução**: Atualizado `models/responses.py` para usar `ConfigDict`:
   ```python
-  # Old (deprecated)
+  # Antigo (depreciado)
   class Config:
       from_attributes = True
   
-  # New (V2 compatible)  
+  # Novo (compatível com V2)  
   model_config = ConfigDict(from_attributes=True)
   ```
 
-#### Async Test Configuration ✅
-- **Issue**: Asyncio warnings and test execution issues
-- **Solution**: Added `asyncio_mode = "auto"` for automatic async handling
+#### Configuração de Teste Async ✅
+- **Problema**: Avisos Asyncio e problemas de execução de teste
+- **Solução**: Adicionado `asyncio_mode = "auto"` para tratamento automático de async
 
-### Running Tests with Different Warning Levels
+### Executando Testes com Diferentes Níveis de Avisos
 
 ```bash
-# Development (show warnings)
+# Desenvolvimento (mostrar avisos)
 pytest -W default
 
-# CI/CD (strict warnings)
+# CI/CD (avisos rigorosos)
 pytest -W error::DeprecationWarning -W error::PendingDeprecationWarning
 
-# Debug specific warnings
+# Debug avisos específicos
 pytest -W error::DeprecationWarning:my_module.*
 ```
 
