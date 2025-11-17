@@ -55,8 +55,8 @@ def client():
 
     asyncio.run(create_tables())
 
-    with TestClient(app) as test_client:
-        yield test_client
+    test_client = TestClient(app)
+    yield test_client
 
     # Clean up tables after testing
     async def drop_tables():
