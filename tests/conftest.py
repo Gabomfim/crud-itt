@@ -15,6 +15,9 @@ TestingAsyncSessionLocal = async_sessionmaker(
     bind=async_engine, class_=AsyncSession, expire_on_commit=False
 )
 
+# For backward compatibility with tests that use TestingSessionLocal
+TestingSessionLocal = TestingAsyncSessionLocal
+
 
 async def override_get_db():
     async with TestingAsyncSessionLocal() as session:

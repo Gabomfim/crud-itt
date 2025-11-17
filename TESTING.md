@@ -47,6 +47,57 @@ pip install pytest-cov
 pytest --cov=. --cov-report=html
 ```
 
+## Pytest Warning Management
+
+### Configuration Overview
+
+The pytest configuration is defined in `pyproject.toml` with comprehensive warning management:
+
+```toml
+[tool.pytest.ini_options]
+filterwarnings = [
+    "error::DeprecationWarning",                    # Treat deprecation warnings as errors
+    "error::PendingDeprecationWarning",             # Treat pending deprecation warnings as errors
+    "ignore::DeprecationWarning:pkg_resources.*",   # Ignore pkg_resources deprecations
+    "ignore::DeprecationWarning:distutils.*",       # Ignore distutils deprecations
+    "ignore::DeprecationWarning:urllib3.*",         # Ignore urllib3 deprecations
+    "ignore::UserWarning:anyio.*",                  # Ignore anyio user warnings
+    "ignore::RuntimeWarning:asyncio.*"              # Ignore asyncio runtime warnings
+]
+asyncio_mode = "auto"                               # Auto-handle async tests
+```
+
+### Warning Resolution History
+
+#### Pydantic V2 Migration ✅
+- **Issue**: `PydanticDeprecatedSince20` warnings for class-based config
+- **Solution**: Updated `models/responses.py` to use `ConfigDict`:
+  ```python
+  # Old (deprecated)
+  class Config:
+      from_attributes = True
+  
+  # New (V2 compatible)  
+  model_config = ConfigDict(from_attributes=True)
+  ```
+
+#### Async Test Configuration ✅
+- **Issue**: Asyncio warnings and test execution issues
+- **Solution**: Added `asyncio_mode = "auto"` for automatic async handling
+
+### Running Tests with Different Warning Levels
+
+```bash
+# Development (show warnings)
+pytest -W default
+
+# CI/CD (strict warnings)
+pytest -W error::DeprecationWarning -W error::PendingDeprecationWarning
+
+# Debug specific warnings
+pytest -W error::DeprecationWarning:my_module.*
+```
+
 ## Test Categories
 
 ### 1. Model Tests (`test_models.py`)

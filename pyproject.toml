@@ -35,8 +35,10 @@ sqlalchemy = {extras = ["asyncio"], version = "^2.0.23"}
 asyncpg = "^0.29.0"
 aiosqlite = "^0.19.0"
 python-multipart = "^0.0.6"
-pydantic = "^2.5.0"
+pydantic = "^2.12.0"
+pydantic-settings = "^2.12.0"
 bcrypt = "^4.1.2"
+pyjwt = "^2.8.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.3"
@@ -121,14 +123,23 @@ python_functions = ["test_*"]
 addopts = [
     "-v",
     "--tb=short",
-    "--strict-markers",
-    "--disable-warnings"
+    "--strict-markers"
 ]
 markers = [
     "slow: marks tests as slow",
     "integration: marks tests as integration tests",
     "unit: marks tests as unit tests"
 ]
+filterwarnings = [
+    "error::DeprecationWarning",
+    "error::PendingDeprecationWarning",
+    "ignore::DeprecationWarning:pkg_resources.*",
+    "ignore::DeprecationWarning:distutils.*",
+    "ignore::DeprecationWarning:urllib3.*",
+    "ignore::UserWarning:anyio.*",
+    "ignore::RuntimeWarning:asyncio.*"
+]
+asyncio_mode = "auto"
 
 # mypy configuration
 [tool.mypy]
