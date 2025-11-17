@@ -1,52 +1,52 @@
-# Database Directory 🗄️
+# Diretório Database 🗄️
 
-This directory handles all database connections, models, and initialization for the application.
+Este diretório lida com todas as conexões de banco de dados, modelos e inicialização para a aplicação.
 
-## 🎯 Purpose
+## 🎯 Propósito
 
-The `database/` directory manages data persistence, providing the bridge between your application and the database where user information is stored.
+O diretório `database/` gerencia a persistência de dados, fornecendo a ponte entre sua aplicação e o banco de dados onde as informações do usuário são armazenadas.
 
-## 📁 Directory Structure
+## 📁 Estrutura do Diretório
 
 ```
 database/
-├── __init__.py          # Package initialization
-├── connection.py        # Database connection and ORM models
-└── init.py             # Database initialization with sample data
+├── __init__.py          # Inicialização do pacote
+├── connection.py        # Conexão de banco de dados e modelos ORM
+└── init.py             # Inicialização do banco com dados de amostra
 ```
 
-## 📄 File Overview
+## 📄 Visão Geral dos Arquivos
 
-### `connection.py` - Database Connection & Models
-**Purpose**: Sets up database connection and defines data structure
+### `connection.py` - Conexão de Banco e Modelos
+**Propósito**: Configura conexão de banco de dados e define estrutura de dados
 
-**What it does**:
-- Creates connection to database (SQLite, PostgreSQL, etc.)
-- Defines the User table structure
-- Provides session management for database operations
-- Handles connection pooling for better performance
+**O que faz**:
+- Cria conexão para banco de dados (SQLite, PostgreSQL, etc.)
+- Define a estrutura da tabela User
+- Fornece gerenciamento de sessão para operações de banco
+- Lida com pool de conexões para melhor performance
 
-**For beginners**: Think of this as the "blueprint" that tells the database what a user looks like (username, password, age, etc.) and how to connect to the database.
+**Para iniciantes**: Pense nisso como o "projeto" que diz ao banco de dados como um usuário se parece (nome de usuário, senha, idade, etc.) e como se conectar ao banco de dados.
 
-**Key Components**:
-- `async_engine` - The database connection
-- `AsyncSessionLocal` - Factory for database sessions
-- `Base` - Foundation for all database models
-- `User` - The user table definition
-- `init_database()` - Creates tables if they don't exist
-- `get_db()` - Provides database sessions to API endpoints
+**Componentes Principais**:
+- `async_engine` - A conexão do banco de dados
+- `AsyncSessionLocal` - Fábrica para sessões de banco de dados
+- `Base` - Fundação para todos os modelos de banco de dados
+- `User` - A definição da tabela de usuário
+- `init_database()` - Cria tabelas se elas não existirem
+- `get_db()` - Fornece sessões de banco de dados para endpoints da API
 
-### `init.py` - Database Initialization
-**Purpose**: Sets up initial data for development and testing
+### `init.py` - Inicialização do Banco de Dados
+**Propósito**: Configura dados iniciais para desenvolvimento e teste
 
-**What it does**:
-- Creates sample users if database is empty
-- Provides initial data for development
-- Shows how to create users programmatically
+**O que faz**:
+- Cria usuários de amostra se o banco estiver vazio
+- Fornece dados iniciais para desenvolvimento
+- Mostra como criar usuários programaticamente
 
-**For beginners**: This is like a "setup script" that adds some example users to your database so you have something to work with during development.
+**Para iniciantes**: Isso é como um "script de configuração" que adiciona alguns usuários de exemplo ao seu banco de dados para que você tenha algo com que trabalhar durante o desenvolvimento.
 
-**⚠️ Important**: This file contains sample passwords and should only be used for development!
+**⚠️ Importante**: Este arquivo contém senhas de amostra e deve ser usado apenas para desenvolvimento!
 
 ## 🏗️ Database Schema
 

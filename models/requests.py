@@ -1,24 +1,25 @@
 """
-Request Models Module
+Módulo de Modelos de Requisição
 
-This module defines Pydantic models for API request validation and serialization.
-All request models include comprehensive validation, field constraints, and
-security checks to ensure data integrity and application security.
+Este módulo define modelos Pydantic para validação e serialização de
+requisições da API. Todos os modelos de requisição incluem validação
+abrangente, restrições de campo e verificações de segurança para garantir
+integridade de dados e segurança da aplicação.
 
-Key Features:
-- Strong input validation with field constraints
-- Password complexity validation
-- Username format validation
-- Confirmation field matching
-- Custom validation methods
+Recursos Principais:
+- Validação de entrada forte com restrições de campo
+- Validação de complexidade de senha
+- Validação de formato de nome de usuário
+- Correspondência de campos de confirmação
+- Métodos de validação customizados
 
-Models:
-- UserRequest: Complete user registration/update data
-- PasswordChangeRequest: Secure password change with validation
-- LoginRequest: Simple authentication credentials
+Modelos:
+- UserRequest: Dados completos de registro/atualização de usuário
+- PasswordChangeRequest: Mudança de senha segura com validação
+- LoginRequest: Credenciais simples de autenticação
 
-Author: Gabomfim
-License: MIT
+Autor: Gabomfim
+Licença: MIT
 """
 
 import re
@@ -28,31 +29,31 @@ from pydantic import BaseModel, Field, ValidationInfo, field_validator
 
 class UserRequest(BaseModel):
     """
-    User registration and update request model.
+    Modelo de requisição de registro e atualização de usuário.
 
-    This model validates user registration and profile update requests.
-    It includes comprehensive validation for username format, password
-    complexity, age constraints, and description length.
+    Este modelo valida requisições de registro de usuário e atualização
+    de perfil. Inclui validação abrangente para formato de nome de usuário,
+    complexidade de senha, restrições de idade e comprimento de descrição.
 
-    Attributes:
-        username (str): Unique username with alphanumeric and underscore characters
-        password (str): Secure password meeting complexity requirements
-        age (int): User age between 1 and 120 years
-        description (str): Optional user description up to 200 characters
+    Atributos:
+        username (str): Nome de usuário único com caracteres alfanuméricos e sublinhados
+        password (str): Senha segura atendendo requisitos de complexidade
+        age (int): Idade do usuário entre 1 e 120 anos
+        description (str): Descrição opcional do usuário até 200 caracteres
 
-    Validation Rules:
-        - Username: 3-30 characters, alphanumeric + underscores only
-        - Password: Minimum 8 characters with complexity requirements
-        - Age: Must be between 1 and 120
-        - Description: Maximum 200 characters, optional
+    Regras de Validação:
+        - Nome de usuário: 3-30 caracteres, apenas alfanuméricos + sublinhados
+        - Senha: Mínimo 8 caracteres com requisitos de complexidade
+        - Idade: Deve estar entre 1 e 120
+        - Descrição: Máximo 200 caracteres, opcional
 
-    Example:
+    Exemplo:
         ```python
         user_data = UserRequest(
-            username="john_doe",
-            password="SecurePass123!",
+            username="joao_silva",
+            password="SenhaSegura123!",
             age=25,
-            description="Software developer"
+            description="Desenvolvedor de software"
         )
         ```
     """

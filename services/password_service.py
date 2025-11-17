@@ -1,63 +1,63 @@
 """
-Secure Password Hashing and Verification Service
+Serviço Seguro de Hash e Verificação de Senhas
 
-This module provides secure password hashing and verification functionality
-using bcrypt algorithm with configurable salt rounds for optimal security
-and performance balance in the CRUD ITT application.
+Este módulo fornece funcionalidade segura de hash e verificação de senhas
+usando algoritmo bcrypt com salt rounds configuráveis para balanço ótimo
+de segurança e performance na aplicação CRUD ITT.
 
-Key Features:
-- Industry-standard bcrypt password hashing
-- Configurable salt rounds for security/performance tuning
-- Secure salt generation for each password
-- Constant-time password verification
-- UTF-8 encoding handling for international characters
-- Integration with application configuration system
+Recursos Principais:
+- Hash de senhas bcrypt padrão da indústria
+- Salt rounds configuráveis para ajuste de segurança/performance
+- Geração segura de salt para cada senha
+- Verificação de senha em tempo constante
+- Tratamento de codificação UTF-8 para caracteres internacionais
+- Integração com sistema de configuração da aplicação
 
-Security Features:
-- Unique salt generation for each password (prevents rainbow table attacks)
-- Configurable work factor (salt rounds) to adapt to hardware improvements
-- Secure random salt generation using OS entropy
-- Constant-time comparison to prevent timing attacks
-- No plaintext password storage or logging
+Recursos de Segurança:
+- Geração de salt único para cada senha (previne ataques de tabela arco-íris)
+- Fator de trabalho configurável (salt rounds) para adaptar a melhorias de hardware
+- Geração de salt aleatório seguro usando entropia do SO
+- Comparação em tempo constante para prevenir ataques de timing
+- Nenhum armazenamento ou logging de senhas em texto plano
 
-Performance Considerations:
-- Salt rounds configurable via settings (default: 12)
-- Higher rounds = more secure but slower
-- Recommended ranges: 10-15 for current hardware
-- Hashing time scales exponentially with rounds
-- Consider async operations for web requests
+Considerações de Performance:
+- Salt rounds configuráveis via configurações (padrão: 12)
+- Mais rounds = mais seguro mas mais lento
+- Faixas recomendadas: 10-15 para hardware atual
+- Tempo de hash escala exponencialmente com rounds
+- Considere operações assíncronas para requisições web
 
-Configuration:
-Salt rounds are configured via application settings:
-- Development: 10-12 rounds (faster for testing)
-- Production: 12-15 rounds (optimal security)
-- High-security: 15+ rounds (government/financial)
+Configuração:
+Salt rounds são configurados via configurações da aplicação:
+- Desenvolvimento: 10-12 rounds (mais rápido para testes)
+- Produção: 12-15 rounds (segurança ótima)
+- Alta segurança: 15+ rounds (governo/financeiro)
 
-Usage:
+Uso:
 ```python
 from services.password_service import hash_password, verify_password
 
-# Hash password during registration
+# Hash da senha durante registro
 hashed = hash_password("user_password123")
 
-# Verify password during login
+# Verificar senha durante login
 is_valid = verify_password("user_password123", hashed)
 ```
 
-Integration:
-- Used by authentication service for login verification
-- Used by user service for password changes
-- Integrated with API endpoints for user management
-- Compatible with database storage requirements
+Integração:
+- Usado pelo serviço de autenticação para verificação de login
+- Usado pelo serviço de usuário para mudanças de senha
+- Integrado com endpoints da API para gerenciamento de usuários
+- Compatível com requisitos de armazenamento do banco de dados
 
-Security Standards:
-- Follows OWASP password storage guidelines
-- Resistant to common attack vectors
-- Suitable for compliance requirements
-- Regular security review recommended
+Padrões de Segurança:
+- Segue diretrizes de armazenamento de senhas OWASP
+- Resistente a vetores de ataque comuns
+- Adequado para requisitos de conformidade
+- Revisão de segurança regular recomendada
 
-Author: Gabomfim
-License: MIT
+Autor: Gabomfim
+Licença: MIT
 """
 
 import bcrypt
@@ -66,58 +66,59 @@ from config import settings
 
 
 def hash_password(password: str) -> str:
-    """Generate secure bcrypt hash for password with configurable work factor.
+    """Gera hash bcrypt seguro para senha com fator de trabalho configurável.
 
-    This function creates a cryptographically secure password hash using the bcrypt
-    algorithm with a unique salt for each password. The work factor (salt rounds)
-    is configurable via application settings to balance security and performance.
+    Esta função cria um hash de senha criptograficamente seguro usando o
+    algoritmo bcrypt com um salt único para cada senha. O fator de trabalho
+    (salt rounds) é configurável via configurações da aplicação para
+    balancear segurança e performance.
 
-    Security Features:
-        - Unique salt generation for each password (prevents rainbow table attacks)
-        - Configurable work factor via settings.security.bcrypt_rounds
-        - Secure random salt using OS entropy sources
-        - Industry-standard bcrypt algorithm (Blowfish-based)
-        - UTF-8 encoding support for international characters
+    Recursos de Segurança:
+        - Geração de salt único para cada senha (previne ataques de tabela arco-íris)
+        - Fator de trabalho configurável via settings.security.bcrypt_rounds
+        - Salt aleatório seguro usando fontes de entropia do SO
+        - Algoritmo bcrypt padrão da indústria (baseado em Blowfish)
+        - Suporte à codificação UTF-8 para caracteres internacionais
 
     Args:
-        password: Plaintext password to hash
-                 Should be validated for strength before hashing
-                 Supports Unicode characters and special symbols
-                 Typically 8-128 characters in length
+        password: Senha em texto plano para fazer hash
+                 Deve ser validada quanto à força antes do hash
+                 Suporta caracteres Unicode e símbolos especiais
+                 Tipicamente 8-128 caracteres de comprimento
 
     Returns:
-        str: Base64-encoded bcrypt hash as UTF-8 string
-             Format: $2b$[rounds]$[22-char salt][31-char hash]
-             Example: "$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj7RG6V8K2.y"
-             Length: ~60 characters for storage planning
+        str: Hash bcrypt codificado em Base64 como string UTF-8
+             Formato: $2b$[rounds]$[salt-22-char][hash-31-char]
+             Exemplo: "$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj7RG6V8K2.y"
+             Comprimento: ~60 caracteres para planejamento de armazenamento
 
     Performance:
-        - Execution time depends on configured salt rounds:
-          * 10 rounds: ~10ms (fast, minimum recommended)
-          * 12 rounds: ~50ms (default, good balance)
-          * 14 rounds: ~200ms (high security)
-          * 16 rounds: ~800ms (very high security)
-        - Time scales exponentially: each +1 round doubles time
-        - Consider async operations for web request contexts
+        - Tempo de execução depende dos salt rounds configurados:
+          * 10 rounds: ~10ms (rápido, mínimo recomendado)
+          * 12 rounds: ~50ms (padrão, bom equilíbrio)
+          * 14 rounds: ~200ms (alta segurança)
+          * 16 rounds: ~800ms (segurança muito alta)
+        - Tempo escala exponencialmente: cada +1 round dobra tempo
+        - Considere operações assíncronas para contextos de requisição web
 
-    Configuration:
-        Salt rounds configured via settings.security.bcrypt_rounds:
-        - Development: 10-11 (faster testing)
-        - Production: 12-13 (standard security)
-        - High-security: 14-15 (government/financial)
+    Configuração:
+        Salt rounds configurados via settings.security.bcrypt_rounds:
+        - Desenvolvimento: 10-11 (teste mais rápido)
+        - Produção: 12-13 (segurança padrão)
+        - Alta segurança: 14-15 (governo/financeiro)
 
-    Usage Examples:
+    Exemplos de Uso:
         ```python
-        # Standard usage
-        hashed = hash_password("MySecurePassword123!")
+        # Uso padrão
+        hashed = hash_password("MinhaSenh​aSegura123!")
 
-        # With validation
+        # Com validação
         if validate_password_strength(password):
             hashed = hash_password(password)
             store_in_database(username, hashed)
         ```
 
-    Security Considerations:
+    Considerações de Segurança:
         - Never log or store the input password
         - Always validate password strength before hashing
         - Use HTTPS to protect password transmission

@@ -1,53 +1,53 @@
-# Tests Directory 🧪
+# Diretório Tests 🧪
 
-This directory contains the complete test suite that ensures all parts of the application work correctly and reliably.
+Este diretório contém a suíte completa de testes que garante que todas as partes da aplicação funcionem correta e confiavelmente.
 
-## 🎯 Purpose
+## 🎯 Propósito
 
-The `tests/` directory provides comprehensive testing for all application components, helping prevent bugs, ensure security, and maintain code quality during development and deployment.
+O diretório `tests/` fornece testes abrangentes para todos os componentes da aplicação, ajudando a prevenir bugs, garantir segurança e manter qualidade de código durante desenvolvimento e deploy.
 
-## 📁 Directory Structure
+## 📁 Estrutura do Diretório
 
 ```
 tests/
-├── __init__.py                # Package initialization
-├── conftest.py               # Shared test configuration and fixtures
-├── test_api.py               # API endpoint integration tests
-├── test_auth_service.py      # Authentication service tests
-├── test_auth.py              # Authentication flow tests
-├── test_models.py            # Data model validation tests
-├── test_password_service.py  # Password security tests
-└── test_services.py          # Business logic service tests
+├── __init__.py                # Inicialização do pacote
+├── conftest.py               # Configuração de teste compartilhada e fixtures
+├── test_api.py               # Testes de integração de endpoints da API
+├── test_auth_service.py      # Testes do serviço de autenticação
+├── test_auth.py              # Testes de fluxo de autenticação
+├── test_models.py            # Testes de validação de modelos de dados
+├── test_password_service.py  # Testes de segurança de senhas
+└── test_services.py          # Testes de serviços de lógica de negócio
 ```
 
-## 📄 File Overview
+## 📄 Visão Geral dos Arquivos
 
-### `conftest.py` - Test Configuration
-**Purpose**: Shared test setup and reusable test fixtures
+### `conftest.py` - Configuração de Testes
+**Propósito**: Configuração de teste compartilhada e fixtures reutilizáveis
 
-**What it does**:
-- Sets up test database (separate from production)
-- Creates test client for API testing
-- Provides sample test data
-- Configures test environment settings
-- Manages test database cleanup
+**O que faz**:
+- Configura banco de dados de teste (separado da produção)
+- Cria cliente de teste para testes da API
+- Fornece dados de teste de amostra
+- Configura configurações do ambiente de teste
+- Gerencia limpeza do banco de dados de teste
 
-**For beginners**: Think of this as the "test setup assistant" that prepares everything needed for tests to run properly, like setting up a separate test database so your real data doesn't get affected.
+**Para iniciantes**: Pense nisso como o "assistente de configuração de teste" que prepara tudo que é necessário para os testes rodarem adequadamente, como configurar um banco de dados de teste separado para que seus dados reais não sejam afetados.
 
-### `test_api.py` - API Integration Tests
-**Purpose**: Tests complete API workflows from request to response
+### `test_api.py` - Testes de Integração da API
+**Propósito**: Testa fluxos completos da API da requisição à resposta
 
-**What it tests**:
-- User registration endpoint
-- User login endpoint
-- Protected endpoint access
-- Error handling and status codes
-- Request/response data formats
+**O que testa**:
+- Endpoint de registro de usuário
+- Endpoint de login de usuário
+- Acesso a endpoints protegidos
+- Tratamento de erros e códigos de status
+- Formatos de dados de requisição/resposta
 
-**For beginners**: These tests check if your API endpoints work correctly when someone makes HTTP requests to them, like testing if the "create user" button actually creates a user.
+**Para iniciantes**: Estes testes verificam se os endpoints da sua API funcionam corretamente quando alguém faz requisições HTTP para eles, como testar se o botão "criar usuário" realmente cria um usuário.
 
-### `test_auth_service.py` - Authentication Service Tests
-**Purpose**: Tests the authentication and JWT token system
+### `test_auth_service.py` - Testes do Serviço de Autenticação
+**Propósito**: Testa o sistema de autenticação e tokens JWT
 
 **What it tests**:
 - User authentication with valid/invalid credentials

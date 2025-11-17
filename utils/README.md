@@ -1,53 +1,53 @@
-# Utils Directory 🛠️
+# Diretório Utils 🔠️
 
-This directory contains utility functions, middleware, and helper tools that support the entire application.
+Este diretório contém funções utilitárias, middleware e ferramentas auxiliares que suportam toda a aplicação.
 
-## 🎯 Purpose
+## 🎯 Propósito
 
-The `utils/` directory provides common functionality that multiple parts of the application need, such as logging, request processing, and middleware that runs on every request.
+O diretório `utils/` fornece funcionalidade comum que múltiplas partes da aplicação precisam, como logging, processamento de requisições e middleware que executa em cada requisição.
 
-## 📁 Directory Structure
+## 📁 Estrutura do Diretório
 
 ```
 utils/
-├── __init__.py          # Package initialization
-├── logging_config.py    # Logging configuration and structured logging
-└── middleware.py        # HTTP middleware for request processing
+├── __init__.py          # Inicialização do pacote
+├── logging_config.py    # Configuração de logging e logging estruturado
+└── middleware.py        # Middleware HTTP para processamento de requisições
 ```
 
-## 📄 File Overview
+## 📄 Visão Geral dos Arquivos
 
-### `logging_config.py` - Logging System
-**Purpose**: Comprehensive logging system for monitoring and debugging
+### `logging_config.py` - Sistema de Logging
+**Propósito**: Sistema abrangente de logging para monitoramento e debugging
 
-**What it does**:
-- Sets up structured logging (JSON format for production)
-- Provides different log levels (DEBUG, INFO, WARNING, ERROR)
-- Includes request tracing with unique IDs
-- Supports integration with monitoring tools
-- Formats logs for easy reading and analysis
+**O que faz**:
+- Configura logging estruturado (formato JSON para produção)
+- Fornece diferentes níveis de log (DEBUG, INFO, WARNING, ERROR)
+- Inclui rastreamento de requisições com IDs únicos
+- Suporta integração com ferramentas de monitoramento
+- Formata logs para fácil leitura e análise
 
-**For beginners**: Think of this as the "diary" of your application - it writes down everything that happens so you can see what went wrong if there are problems, or monitor how well things are working.
+**Para iniciantes**: Pense nisso como o "diário" da sua aplicação - ele anota tudo que acontece para que você possa ver o que deu errado se houver problemas, ou monitorar quão bem as coisas estão funcionando.
 
-**Key Components**:
-- `JSONFormatter` - Formats logs as structured JSON
-- `StructuredAdapter` - Adds context to log messages
-- `setup_logging()` - Configures the logging system
-- `get_logger()` - Gets a logger for any module
+**Componentes Principais**:
+- `JSONFormatter` - Formata logs como JSON estruturado
+- `StructuredAdapter` - Adiciona contexto às mensagens de log
+- `setup_logging()` - Configura o sistema de logging
+- `get_logger()` - Obtém um logger para qualquer módulo
 
-### `middleware.py` - HTTP Middleware
-**Purpose**: Processes every HTTP request and response
+### `middleware.py` - Middleware HTTP
+**Propósito**: Processa cada requisição e resposta HTTP
 
-**What it does**:
-- Logs all incoming requests and responses
-- Adds unique request IDs for tracing
-- Measures response times for performance monitoring
-- Provides health check endpoints
-- Handles CORS and other cross-cutting concerns
+**O que faz**:
+- Registra todas as requisições e respostas que chegam
+- Adiciona IDs únicos de requisição para rastreamento
+- Mede tempos de resposta para monitoramento de performance
+- Fornece endpoints de health check
+- Lida com CORS e outras preocupações transversais
 
-**For beginners**: Think of middleware as "inspectors" that check every request coming in and every response going out, making notes about what happened and how long it took.
+**Para iniciantes**: Pense no middleware como "inspetores" que verificam cada requisição que entra e cada resposta que sai, fazendo anotações sobre o que aconteceu e quanto tempo levou.
 
-**Key Components**:
+**Componentes Principais**:
 - `RequestLoggingMiddleware` - Logs all HTTP traffic
 - `HealthCheckMiddleware` - Provides health check endpoints
 
