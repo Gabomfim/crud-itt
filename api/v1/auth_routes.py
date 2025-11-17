@@ -28,21 +28,22 @@ License: MIT
 """
 
 from datetime import timedelta
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from config import settings
 from database.connection import get_db
 from models.requests import LoginRequest
-from models.responses import LoginResponse, UserResponse, Token
+from models.responses import LoginResponse, Token, UserResponse
 from services.auth_service import (
     authenticate_user,
+    blacklist_token,
     create_access_token,
     get_current_user,
-    blacklist_token,
-    security
+    security,
 )
-from config import settings
 from utils.logging_config import get_logger
 
 logger = get_logger(__name__)
@@ -51,31 +52,30 @@ router = APIRouter()
 
 @router.post("/login", response_model=LoginResponse)
 async def login(
-    login_request: LoginRequest, 
-    db: AsyncSession = Depends(get_db)
+    login_request: LoginRequest, db: AsyncSession = Depends(get_db)
 ) -> LoginResponse:
     """
     Authenticate user and return JWT access token.
-    
+
     This endpoint validates user credentials and returns a complete
     authentication response including user information and JWT token.
     The token can be used for subsequent authenticated requests.
-    
+
     Args:
         login_request (LoginRequest): User credentials (username and password)
         db (AsyncSession): Database session dependency
-        
+
     Returns:
         LoginResponse: Complete authentication response containing:
             - user: User profile information
             - token: JWT access token with expiration
             - message: Success confirmation
-            
+
     Raises:
-        HTTPException: 
+        HTTPException:
             - 401 Unauthorized: Invalid username or password
             - 500 Internal Server Error: Unexpected server error
-            
+
     Example Request:
         ```json
         POST /api/v1/auth/login
@@ -84,7 +84,7 @@ async def login(
             "password": "secure_password123"
         }
         ```
-        
+
     Example Response:
         ```json
         {
@@ -102,7 +102,7 @@ async def login(
             "message": "Login successful"
         }
         ```
-        
+
     Security Notes:
         - Password verification uses secure bcrypt hashing
         - Failed attempts are logged for security monitoring
@@ -110,98 +110,91 @@ async def login(
         - JWT tokens are signed with application secret key
     """
     logger.info("Login attempt", extra={"username": login_request.username})
-    
+
     try:
         # Authenticate user
         user = await authenticate_user(
-            login_request.username, 
-            login_request.password, 
-            db
+            login_request.username, login_request.password, db
         )
-        
+
         # Create access token
         access_token_expires = timedelta(
             minutes=settings.security.jwt_access_token_expire_minutes
         )
         access_token = create_access_token(
-            data={"sub": user.username}, 
-            expires_delta=access_token_expires
+            data={"sub": user.username}, expires_delta=access_token_expires
         )
-        
+
         # Create response
         user_response = UserResponse(
             id=user.id,
             username=user.username,
             age=user.age,
-            description=user.description
+            description=user.description,
         )
-        
+
         token_response = Token(
             access_token=access_token,
             token_type="bearer",
-            expires_in=settings.security.jwt_access_token_expire_minutes * 60
+            expires_in=settings.security.jwt_access_token_expire_minutes * 60,
         )
-        
+
         logger.info(
-            "Login successful", 
-            extra={"username": user.username, "user_id": user.id}
+            "Login successful", extra={"username": user.username, "user_id": user.id}
         )
-        
+
         return LoginResponse(
-            user=user_response,
-            token=token_response,
-            message="Login successful"
+            user=user_response, token=token_response, message="Login successful"
         )
-        
+
     except HTTPException as e:
         logger.warning(
-            "Login failed", 
-            extra={"username": login_request.username, "error": e.detail}
+            "Login failed",
+            extra={"username": login_request.username, "error": e.detail},
         )
         raise
     except Exception as e:
         logger.error(
-            "Login error", 
+            "Login error",
             extra={"username": login_request.username, "error": str(e)},
-            exc_info=True
+            exc_info=True,
         )
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Internal server error"
+            detail="Internal server error",
         )
 
 
 @router.post("/logout")
 async def logout(
     credentials: HTTPAuthorizationCredentials = Depends(security),
-    current_user: UserResponse = Depends(get_current_user)
+    current_user: UserResponse = Depends(get_current_user),
 ) -> dict[str, str]:
     """Logout user by blacklisting their token"""
     if not credentials:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Authentication required"
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Authentication required"
         )
-    
+
     token = credentials.credentials
     blacklist_token(token)
-    
+
     logger.info(
-        "User logged out", 
-        extra={"username": current_user.username, "user_id": current_user.id}
+        "User logged out",
+        extra={"username": current_user.username, "user_id": current_user.id},
     )
-    
+
     return {"message": "Logout successful"}
 
 
 @router.get("/me", response_model=UserResponse)
 async def get_current_user_info(
-    current_user: UserResponse = Depends(get_current_user)
+    current_user: UserResponse = Depends(get_current_user),
 ) -> UserResponse:
     """Get current authenticated user information"""
     return UserResponse(
         id=current_user.id,
         username=current_user.username,
         age=current_user.age,
-        description=current_user.description
+        description=current_user.description,
     )
