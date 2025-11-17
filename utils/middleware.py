@@ -220,9 +220,9 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
                     "path": request.url.path,
                     "status_code": status_code,
                     "duration_ms": round(duration * 1000, 2),
-                    "response_size": response.headers.get("content-length")
-                    if response
-                    else None,
+                    "response_size": (
+                        response.headers.get("content-length") if response else None
+                    ),
                 },
             )
 

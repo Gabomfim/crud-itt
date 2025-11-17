@@ -4,35 +4,35 @@ repos:
     hooks:
       - id: black
         name: black
-        entry: black
+        entry: /Users/silvs/opt/miniconda3/bin/python -m black
         language: system
         types: [python]
         args: [--line-length=88]
 
       - id: isort
         name: isort
-        entry: isort
+        entry: /Users/silvs/opt/miniconda3/bin/python -m isort
         language: system
         types: [python]
         args: ["--profile", "black"]
 
       - id: flake8
         name: flake8
-        entry: flake8
+        entry: /Users/silvs/opt/miniconda3/bin/python -m flake8
         language: system
         types: [python]
         args: ["--max-line-length=88", "--extend-ignore=E203,W503"]
 
       - id: mypy
         name: mypy
-        entry: mypy .
+        entry: /Users/silvs/opt/miniconda3/bin/python -m mypy .
         language: system
         pass_filenames: false
         always_run: true
 
       - id: pytest
         name: Run tests
-        entry: pytest
+        entry: /Users/silvs/opt/miniconda3/bin/python -m pytest
         language: system
         types: [python]
         pass_filenames: false

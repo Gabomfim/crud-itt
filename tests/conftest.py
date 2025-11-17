@@ -1,5 +1,7 @@
 import pytest
 import pytest_asyncio
+
+# Import TestClient
 from fastapi.testclient import TestClient
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
@@ -55,7 +57,7 @@ def client():
 
     asyncio.run(create_tables())
 
-    # Use positional argument to avoid keyword argument issues across versions
+    # Create TestClient
     test_client = TestClient(app)
     yield test_client
 
