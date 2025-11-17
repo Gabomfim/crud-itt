@@ -1,53 +1,53 @@
-# Docker Deployment Guide
+# Guia de Deploy com Docker
 
-## 🐳 Docker Setup for User Management API
+## 🐳 Configuração Docker para API de Gerenciamento de Usuários
 
-This guide covers containerizing and deploying the FastAPI application using Docker.
+Este guia cobre a containerização e deploy da aplicação FastAPI usando Docker.
 
-## Files Overview
+## Visão Geral dos Arquivos
 
-- **`Dockerfile`** - Main application container
-- **`docker-compose.yml`** - Multi-service orchestration
-- **`.dockerignore`** - Exclude files from build context
-- **`nginx.conf`** - Reverse proxy configuration
+- **`Dockerfile`** - Container principal da aplicação
+- **`docker-compose.yml`** - Orquestração multi-serviço
+- **`.dockerignore`** - Excluir arquivos do contexto de build
+- **`nginx.conf`** - Configuração de proxy reverso
 
-## Quick Start
+## Início Rápido
 
-### 1. Build and Run (Simple)
+### 1. Build e Execução (Simples)
 ```bash
-# Build the Docker image
+# Fazer build da imagem Docker
 docker build -t user-management-api .
 
-# Run the container
+# Executar o container
 docker run -p 8000:8000 user-management-api
 
-# Access the application at http://localhost:8000
+# Acessar a aplicação em http://localhost:8000
 ```
 
-### 2. Using Docker Compose (Recommended)
+### 2. Usando Docker Compose (Recomendado)
 ```bash
-# Start all services
+# Iniciar todos os serviços
 docker-compose up -d
 
-# View logs
+# Ver logs
 docker-compose logs -f
 
-# Stop services
+# Parar serviços
 docker-compose down
 ```
 
-## Docker Compose Services
+## Serviços do Docker Compose
 
-### 🚀 **Application Service (`app`)**
-- FastAPI application
-- Port: 8000
-- Health checks enabled
-- Volume mounted for database persistence
+### 🚀 **Serviço da Aplicação (`app`)**
+- Aplicação FastAPI
+- Porta: 8000
+- Health checks habilitados
+- Volume montado para persistência do banco de dados
 
-### 🐘 **PostgreSQL Service (`db`)**
+### 🐘 **Serviço PostgreSQL (`db`)**
 - PostgreSQL 15 Alpine
-- Port: 5432
-- Persistent data volume
+- Porta: 5432
+- Volume de dados persistente
 - Health checks enabled
 
 ### 🌐 **Nginx Service (`nginx`)**

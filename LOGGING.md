@@ -1,43 +1,43 @@
-# Logging Documentation
+# Documentação de Logging
 
-This document describes the comprehensive logging system implemented in the FastAPI CRUD application.
+Este documento descreve o sistema abrangente de logging implementado na aplicação FastAPI CRUD.
 
-## Overview
+## Visão Geral
 
-The application implements structured logging with support for both human-readable and JSON formats, making it suitable for both development and production environments.
+A aplicação implementa logging estruturado com suporte para formatos legíveis por humanos e JSON, tornando-a adequada para ambientes de desenvolvimento e produção.
 
-## Features
+## Recursos
 
-### ✅ Core Logging Features
-- **Structured Logging**: JSON format for production, human-readable for development
-- **Request/Response Logging**: Automatic HTTP request tracking with unique request IDs
-- **Error Tracking**: Comprehensive exception logging with stack traces
-- **Performance Monitoring**: Request duration tracking
-- **Health Checks**: Built-in health check endpoint with minimal logging overhead
+### ✅ Recursos Principais de Logging
+- **Logging Estruturado**: Formato JSON para produção, legível por humanos para desenvolvimento
+- **Logging de Requisição/Resposta**: Rastreamento automático de requisições HTTP com IDs únicos
+- **Rastreamento de Erros**: Logging abrangente de exceções com stack traces
+- **Monitoramento de Performance**: Rastreamento de duração de requisições
+- **Health Checks**: Endpoint de health check integrado com overhead mínimo de logging
 
-### ✅ Logging Components
+### ✅ Componentes de Logging
 
-1. **Logging Configuration** (`utils/logging_config.py`)
-   - JSON formatter for structured logs
-   - Environment-based configuration
-   - Structured adapter for enhanced logging
+1. **Configuração de Logging** (`utils/logging_config.py`)
+   - Formatador JSON para logs estruturados
+   - Configuração baseada em ambiente
+   - Adaptador estruturado para logging aprimorado
 
-2. **Request Middleware** (`utils/middleware.py`)
-   - Request/response logging with unique IDs
-   - Client IP extraction
-   - Performance timing
-   - Health check middleware
+2. **Middleware de Requisição** (`utils/middleware.py`)
+   - Logging de requisição/resposta com IDs únicos
+   - Extração de IP do cliente
+   - Cronometragem de performance
+   - Middleware de health check
 
-3. **Service Layer Logging**
-   - Database operation logging
-   - Error handling and recovery
-   - User action tracking
+3. **Logging da Camada de Serviço**
+   - Logging de operações de banco de dados
+   - Tratamento e recuperação de erros
+   - Rastreamento de ações do usuário
 
-4. **Database Logging**
-   - Connection and initialization logging
-   - Transaction error handling
+4. **Logging de Banco de Dados**
+   - Logging de conexão e inicialização
+   - Tratamento de erros de transação
 
-## Configuration
+## Configuração
 
 ### Environment Variables
 

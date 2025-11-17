@@ -1,43 +1,43 @@
-# Migration Summary
+# Resumo da Migração
 
-## Overview
-Successfully migrated the FastAPI CRUD application to use:
-1. **Async database operations** with SQLAlchemy 2.0+ and aiosqlite
-2. **Poetry package management** with proper dependency separation
+## Visão Geral
+Migração bem-sucedida da aplicação FastAPI CRUD para usar:
+1. **Operações de banco de dados assíncronas** com SQLAlchemy 2.0+ e aiosqlite
+2. **Gerenciamento de pacotes Poetry** com separação adequada de dependências
 
-## Changes Made
+## Mudanças Realizadas
 
-### 1. Async Database Migration
-- **database/connection.py**: Converted to use `create_async_engine` and `AsyncSession`
-- **services/user_service.py**: All functions converted to async/await pattern
-- **api/v1/user_routes.py**: All route handlers now properly await service functions
-- **app.py**: Added async lifespan management for database initialization
+### 1. Migração de Banco de Dados Assíncrono
+- **database/connection.py**: Convertido para usar `create_async_engine` e `AsyncSession`
+- **services/user_service.py**: Todas as funções convertidas para padrão async/await
+- **api/v1/user_routes.py**: Todos os handlers de rota agora aguardam adequadamente funções de serviço
+- **app.py**: Adicionado gerenciamento assíncrono de lifespan para inicialização do banco
 
-### 2. Poetry Package Management
-- **pyproject.toml**: Comprehensive configuration with:
-  - Essential dependencies in `[tool.poetry.dependencies]`
-  - Development tools in `[tool.poetry.group.dev.dependencies]`
-  - Code quality tools configuration (Black, isort, flake8, mypy, pytest)
-  - Package mode disabled for application use case
-- **Python version**: Updated to require Python 3.9+ for flake8 compatibility
-- **CI/CD**: Updated GitHub Actions workflows to use Poetry
+### 2. Gerenciamento de Pacotes Poetry
+- **pyproject.toml**: Configuração abrangente com:
+  - Dependências essenciais em `[tool.poetry.dependencies]`
+  - Ferramentas de desenvolvimento em `[tool.poetry.group.dev.dependencies]`
+  - Configuração de ferramentas de qualidade de código (Black, isort, flake8, mypy, pytest)
+  - Modo de pacote desabilitado para caso de uso de aplicação
+- **Versão Python**: Atualizada para requerer Python 3.9+ para compatibilidade com flake8
+- **CI/CD**: Workflows do GitHub Actions atualizados para usar Poetry
 
-### 3. Testing Infrastructure
-- **tests/conftest.py**: Fixed to work with both sync and async test clients
-- All tests passing with async database operations
+### 3. Infraestrutura de Testes
+- **tests/conftest.py**: Corrigido para funcionar com clientes de teste síncronos e assíncronos
+- Todos os testes passando com operações de banco de dados assíncronas
 
-## Key Benefits
-1. **Performance**: Async database operations improve scalability
-2. **Dependency Management**: Poetry provides better dependency resolution and lock files
-3. **Development Experience**: Separated dev dependencies and proper tool configuration
-4. **CI/CD**: Consistent environment management across development and deployment
+## Benefícios Principais
+1. **Performance**: Operações de banco de dados assíncronas melhoram escalabilidade
+2. **Gerenciamento de Dependências**: Poetry fornece melhor resolução de dependências e arquivos de lock
+3. **Experiência de Desenvolvimento**: Dependências de dev separadas e configuração adequada de ferramentas
+4. **CI/CD**: Gerenciamento consistente de ambiente entre desenvolvimento e deploy
 
-## Usage
+## Uso
 ```bash
-# Install dependencies
+# Instalar dependências
 poetry install
 
-# Run the application
+# Executar a aplicação
 poetry run uvicorn app:app --host 0.0.0.0 --port 8000 --reload
 
 # Run tests

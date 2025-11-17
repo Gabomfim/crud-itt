@@ -1,52 +1,52 @@
-# Code Quality and Formatting Setup
+# Configuração de Qualidade de Código e Formatação
 
-This project uses automated code formatting and quality checks that run before every commit.
+Este projeto usa formatação de código automatizada e verificações de qualidade que executam antes de cada commit.
 
-## Tools Used
+## Ferramentas Utilizadas
 
-### 🎨 **Black** - Code Formatter
-- Automatically formats Python code to consistent style
-- Line length: 88 characters
-- Runs on every commit
+### 🎨 **Black** - Formatador de Código
+- Formata automaticamente código Python para estilo consistente
+- Comprimento de linha: 88 caracteres
+- Executa a cada commit
 
-### 🔧 **isort** - Import Sorter  
-- Automatically sorts and organizes imports
-- Compatible with Black formatting
+### 🔧 **isort** - Organizador de Imports  
+- Ordena e organiza automaticamente imports
+- Compatível com formatação Black
 
 ### 📏 **Flake8** - Linter
-- Checks code quality and style issues
-- Enforces PEP 8 compliance
-- Compatible with Black (ignores E203, W503)
+- Verifica problemas de qualidade e estilo de código
+- Força conformidade com PEP 8
+- Compatível com Black (ignora E203, W503)
 
-### 🔍 **mypy** - Static Type Checker
-- Performs static type analysis on Python code
-- Catches type-related errors before runtime
-- Ensures type annotations are correct and consistent
-- Configured with strict type checking options
+### 🔍 **mypy** - Verificador de Tipo Estático
+- Realiza análise de tipo estático em código Python
+- Captura erros relacionados a tipos antes da execução
+- Garante que anotações de tipo estejam corretas e consistentes
+- Configurado com opções de verificação de tipo estrita
 
-### ✅ **Pre-commit Hooks**
-- Runs automatically before git commits
-- Prevents committing poorly formatted code
-- Includes additional checks (trailing whitespace, file endings, etc.)
+### ✅ **Hooks de Pre-commit**
+- Executa automaticamente antes dos commits git
+- Previne commit de código mal formatado
+- Inclui verificações adicionais (espaços em branco, fins de arquivo, etc.)
 
-## Setup Instructions
+## Instruções de Configuração
 
-### 1. Install Dependencies
+### 1. Instalar Dependências
 ```bash
 pip install -r requirements.txt
 ```
 
-### 2. Install Pre-commit Hooks
+### 2. Instalar Hooks de Pre-commit
 ```bash
 pre-commit install
 ```
 
-### 3. (Optional) Install Pre-push Hook for Tests
+### 3. (Opcional) Instalar Hook de Pre-push para Testes
 ```bash
 pre-commit install --hook-type pre-push
 ```
 
-## Manual Usage
+## Uso Manual
 
 ### Format Code with Black
 ```bash

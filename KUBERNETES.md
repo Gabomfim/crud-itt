@@ -1,42 +1,42 @@
-# Kubernetes Deployment Guide
+# Guia de Deploy no Kubernetes
 
-This guide explains how to deploy the FastAPI CRUD application to Kubernetes.
+Este guia explica como fazer deploy da aplicação FastAPI CRUD no Kubernetes.
 
-## Prerequisites
+## Pré-requisitos
 
-- Kubernetes cluster (local or remote)
-- `kubectl` configured to access your cluster
-- Docker installed for building images
-- For local development: Minikube, kind, or Docker Desktop with Kubernetes
+- Cluster Kubernetes (local ou remoto)
+- `kubectl` configurado para acessar seu cluster
+- Docker instalado para fazer build de imagens
+- Para desenvolvimento local: Minikube, kind, ou Docker Desktop com Kubernetes
 
-## Quick Start
+## Início Rápido
 
-### 1. Deploy the Application
+### 1. Fazer Deploy da Aplicação
 
 ```bash
-# Deploy to development environment (builds image locally)
+# Deploy para ambiente de desenvolvimento (faz build da imagem localmente)
 ./k8s/scripts/deploy.sh development
 
-# Deploy to production environment (uses existing image)
+# Deploy para ambiente de produção (usa imagem existente)
 ./k8s/scripts/deploy.sh production
 ```
 
-### 2. Monitor the Deployment
+### 2. Monitorar o Deploy
 
 ```bash
-# Check deployment status
+# Verificar status do deploy
 ./k8s/scripts/monitor.sh status
 
-# View application logs
+# Ver logs da aplicação
 ./k8s/scripts/monitor.sh logs
 
-# Follow logs in real-time
+# Seguir logs em tempo real
 ./k8s/scripts/monitor.sh logs -f
 ```
 
-### 3. Access the Application
+### 3. Acessar a Aplicação
 
-#### Local Development (Minikube/kind)
+#### Desenvolvimento Local (Minikube/kind)
 ```bash
 # Port forward to localhost
 ./k8s/scripts/monitor.sh port
