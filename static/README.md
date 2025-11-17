@@ -1,53 +1,53 @@
-# Static Directory 🎨
+# Diretório Static 🎨
 
-This directory contains static web assets like CSS stylesheets, images, and other files that don't change during runtime.
+Este diretório contém recursos web estáticos como folhas de estilo CSS, imagens e outros arquivos que não mudam durante o tempo de execução.
 
-## 🎯 Purpose
+## 🎯 Propósito
 
-The `static/` directory serves static files that enhance the web interface of the CRUD ITT application, providing styling, images, and other client-side resources.
+O diretório `static/` serve arquivos estáticos que melhoram a interface web da aplicação CRUD ITT, fornecendo estilos, imagens e outros recursos do lado do cliente.
 
-## 📁 Directory Structure
+## 📁 Estrutura do Diretório
 
 ```
 static/
 └── css/
-    ├── error.css        # Styling for error pages
-    └── main.css         # Main application styling
+    ├── error.css        # Estilos para páginas de erro
+    └── main.css         # Estilos principais da aplicação
 ```
 
-## 📄 File Overview
+## 📄 Visão Geral dos Arquivos
 
-### `css/error.css` - Error Page Styling
-**Purpose**: Provides styling for error pages (404, 500, etc.)
+### `css/error.css` - Estilos da Página de Erro
+**Propósito**: Fornece estilos para páginas de erro (404, 500, etc.)
 
-**What it does**:
-- Styles error page layout and appearance
-- Makes error messages user-friendly and professional
-- Provides consistent visual design for error scenarios
-- Ensures error pages are responsive and accessible
+**O que faz**:
+- Estiliza layout e aparência das páginas de erro
+- Torna mensagens de erro amigáveis e profissionais
+- Fornece design visual consistente para cenários de erro
+- Garante que páginas de erro sejam responsivas e acessíveis
 
-**For beginners**: This is like the "makeup" for error pages - it makes them look nice and professional instead of showing ugly browser default error messages.
+**Para iniciantes**: Isso é como a "maquiagem" para páginas de erro - faz com que pareçam bonitas e profissionais em vez de mostrar mensagens de erro padrão feias do navegador.
 
-### `css/main.css` - Main Application Styling
-**Purpose**: Primary stylesheet for the application's web interface
+### `css/main.css` - Estilos Principais da Aplicação
+**Propósito**: Folha de estilo primária para a interface web da aplicação
 
-**What it does**:
-- Defines overall visual appearance
-- Sets colors, fonts, and layout styles
-- Provides responsive design for different screen sizes
-- Ensures consistent branding and user experience
+**O que faz**:
+- Define aparência visual geral
+- Define cores, fontes e estilos de layout
+- Fornece design responsivo para diferentes tamanhos de tela
+- Garante marca consistente e experiência do usuário
 
-**For beginners**: This is like the "theme" or "skin" of your web application - it controls how everything looks and feels to users.
+**Para iniciantes**: Isso é como o "tema" ou "skin" da sua aplicação web - controla como tudo parece e como os usuários se sentem ao usá-la.
 
-## 🎨 CSS Features
+## 🎨 Recursos CSS
 
-### Error Page Styling (`error.css`)
-The error page styling provides:
+### Estilos da Página de Erro (`error.css`)
+Os estilos da página de erro fornecem:
 
-**Visual Elements**:
-- Clean, professional layout
-- Friendly error messages
-- Consistent color scheme
+**Elementos Visuais**:
+- Layout limpo e profissional
+- Mensagens de erro amigáveis
+- Esquema de cores consistente
 - Proper typography
 
 **Responsive Design**:

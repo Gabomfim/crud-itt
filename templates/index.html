@@ -1,37 +1,72 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
-    <title>User Management API</title>
+    <title>API de Gerenciamento de Usuários - CRUD ITT</title>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="API REST para gerenciamento de usuários com operações CRUD completas">
     <link rel="stylesheet" href="/static/css/main.css">
 </head>
 <body>
     <div class="container">
-        <h1>🚀 User Management API</h1>
-        <div class="banner">BANANANANANANANNANANA</div>
+        <header>
+            <h1>🚀 API de Gerenciamento de Usuários</h1>
+            <div class="subtitle">Sistema CRUD ITT - FastAPI</div>
+        </header>
         
-        <p>Welcome to the User Management API! This API allows you to manage users with full CRUD operations.</p>
+        <section class="welcome">
+            <p>Bem-vindo à API de Gerenciamento de Usuários! Esta API permite gerenciar usuários com operações CRUD completas, autenticação JWT e validação de dados.</p>
+        </section>
         
-        <div class="endpoints">
-            <h3>Available Endpoints:</h3>
-            <div class="endpoint">
-                <strong>GET /usuario/{username}</strong> - Get user information by username
+        <section class="endpoints">
+            <h2>🔗 Endpoints Disponíveis:</h2>
+            
+            <div class="endpoint-group">
+                <h3>👤 Gerenciamento de Usuários</h3>
+                <div class="endpoint">
+                    <strong>GET /usuario/{username}</strong> - Obter informações do usuário por nome
+                </div>
+                <div class="endpoint">
+                    <strong>GET /usuario?minimum_age={idade}</strong> - Obter usuários com idade mínima
+                </div>
+                <div class="endpoint">
+                    <strong>POST /usuario</strong> - Criar um novo usuário
+                </div>
+                <div class="endpoint">
+                    <strong>PUT /usuario/{username}</strong> - Atualizar informações do usuário
+                </div>
+                <div class="endpoint">
+                    <strong>DELETE /usuario/{username}</strong> - Deletar um usuário
+                </div>
             </div>
-            <div class="endpoint">
-                <strong>GET /usuario?minimum_age={age}</strong> - Get users with minimum age
+
+            <div class="endpoint-group">
+                <h3>🔐 Autenticação</h3>
+                <div class="endpoint">
+                    <strong>POST /auth/login</strong> - Fazer login e obter token JWT
+                </div>
+                <div class="endpoint">
+                    <strong>POST /auth/logout</strong> - Fazer logout e invalidar token
+                </div>
             </div>
-            <div class="endpoint">
-                <strong>POST /usuario</strong> - Create a new user
-            </div>
-            <div class="endpoint">
-                <strong>PUT /usuario/{username}</strong> - Update user information
-            </div>
-            <div class="endpoint">
-                <strong>DELETE /usuario/{username}</strong> - Delete a user
-            </div>
-        </div>
+        </section>
         
-        <p><a href="/docs">📚 View API Documentation</a></p>
+        <section class="resources">
+            <h2>📚 Recursos</h2>
+            <div class="resource-links">
+                <a href="/docs" class="resource-link">
+                    📖 Documentação da API (Swagger)
+                </a>
+                <a href="/redoc" class="resource-link">
+                    📝 Documentação ReDoc
+                </a>
+            </div>
+        </section>
+
+        <footer>
+            <p>🛠️ Desenvolvido com FastAPI, SQLAlchemy e Pydantic</p>
+            <p class="version">Versão 1.0.0 | Autor: Gabomfim</p>
+        </footer>
     </div>
 </body>
 </html>
