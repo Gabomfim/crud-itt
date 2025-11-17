@@ -44,11 +44,14 @@ crud-itt/
 ## 🏁 Início Rápido
 
 ### Pré-requisitos
-- Python 3.11+
+- Python 3.10+
+- Poetry (recomendado para gerenciamento de dependências) ou pip
 - PostgreSQL ou SQLite (para banco de dados)
 - Docker (opcional, para deploy containerizado)
 
 ### Instalação
+
+#### Opção 1: Usando Poetry (Recomendado)
 
 1. **Clone o repositório**
    ```bash
@@ -56,28 +59,125 @@ crud-itt/
    cd crud-itt
    ```
 
-2. **Instale as dependências**
+2. **Instale o Poetry** (se ainda não tiver)
    ```bash
-   pip install -r requirements.txt
+   curl -sSL https://install.python-poetry.org | python3 -
+   # ou
+   pip install poetry
    ```
 
-3. **Configure as variáveis de ambiente**
+3. **Instale as dependências**
+   ```bash
+   poetry install
+   ```
+
+4. **Ative o ambiente virtual**
+   ```bash
+   poetry shell
+   ```
+
+5. **Configure as variáveis de ambiente**
    ```bash
    cp .env.example .env
    # Edite o .env com sua configuração
    ```
 
-4. **Inicialize o banco de dados**
+6. **Inicialize o banco de dados**
+   ```bash
+   poetry run python -m database.init
+   ```
+
+7. **Execute a aplicação**
+   ```bash
+   poetry run python app.py
+   ```
+
+#### Opção 2: Usando pip tradicional
+
+1. **Clone o repositório**
+   ```bash
+   git clone <repository-url>
+   cd crud-itt
+   ```
+
+2. **Crie um ambiente virtual**
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # Linux/Mac
+   # ou
+   venv\Scripts\activate     # Windows
+   ```
+
+3. **Instale as dependências**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. **Configure as variáveis de ambiente**
+   ```bash
+   cp .env.example .env
+   # Edite o .env com sua configuração
+   ```
+
+5. **Inicialize o banco de dados**
    ```bash
    python -m database.init
    ```
 
-5. **Execute a aplicação**
+6. **Execute a aplicação**
    ```bash
    python app.py
    ```
 
 A API estará disponível em `http://localhost:8000`
+
+## 🛠️ Desenvolvimento
+
+### Comandos Úteis com Poetry
+
+```bash
+# Instalar dependências de desenvolvimento
+poetry install --with dev
+
+# Executar testes
+poetry run pytest
+
+# Executar linting
+poetry run flake8
+poetry run black .
+poetry run isort .
+
+# Executar verificação de tipos
+poetry run mypy .
+
+# Adicionar nova dependência
+poetry add <package-name>
+
+# Adicionar dependência de desenvolvimento
+poetry add --group dev <package-name>
+
+# Atualizar dependências
+poetry update
+
+# Mostrar dependências
+poetry show --tree
+
+# Gerar requirements.txt (se necessário)
+poetry export -f requirements.txt --output requirements.txt
+```
+
+### Scripts de Desenvolvimento
+
+```bash
+# Executar com auto-reload (desenvolvimento)
+poetry run uvicorn app:app --reload --host 0.0.0.0 --port 8000
+
+# Executar testes com coverage
+poetry run pytest --cov=. --cov-report=html
+
+# Executar pré-commit hooks
+poetry run pre-commit run --all-files
+```
 
 ## 📚 Documentação da API
 
