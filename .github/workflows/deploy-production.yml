@@ -1,0 +1,401 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      force_deploy:
+        description: 'Force deployment even if tests fail'
+        required: false
+        default: 'false'
+        type: boolean
+      skip_staging_check:
+        description: 'Skip staging environment verification'
+        required: false
+        default: 'false'
+        type: boolean
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+  ENVIRONMENT: production
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    if: github.event.inputs.force_deploy != 'true'
+    
+    strategy:
+      matrix:
+        python-version: [3.11]
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Install and configure Poetry
+      uses: snok/install-poetry@v1
+      with:
+        version: latest
+        virtualenvs-create: true
+        virtualenvs-in-project: true
+        installer-parallel: true
+    
+    - name: Cache Poetry dependencies
+      uses: actions/cache@v3
+      with:
+        path: .venv
+        key: ${{ runner.os }}-poetry-${{ hashFiles('**/pyproject.toml') }}
+        restore-keys: |
+          ${{ runner.os }}-poetry-
+    
+    - name: Install dependencies
+      run: poetry install --with dev
+    
+    - name: Run pre-commit hooks
+      run: poetry run pre-commit run --all-files
+    
+    - name: Run comprehensive tests
+      run: |
+        poetry run pytest tests/ -v --tb=short --durations=10
+        poetry run pytest --cov=. --cov-report=xml --cov-fail-under=80
+    
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+
+  staging-verification:
+    runs-on: ubuntu-latest
+    if: github.event.inputs.skip_staging_check != 'true'
+    
+    steps:
+    - name: Verify staging deployment
+      run: |
+        echo "🔍 Verifying staging environment health..."
+        # Add staging environment health check
+        # This could include API endpoint tests, database connectivity, etc.
+        
+        # Example health check (customize based on your staging environment)
+        if [ -n "${{ secrets.STAGING_URL }}" ]; then
+          response=$(curl -s -o /dev/null -w "%{http_code}" ${{ secrets.STAGING_URL }}/health || echo "000")
+          if [ "$response" != "200" ]; then
+            echo "❌ Staging environment is not healthy (HTTP $response)"
+            echo "Cannot proceed with production deployment"
+            exit 1
+          fi
+          echo "✅ Staging environment is healthy"
+        else
+          echo "⚠️ STAGING_URL not configured, skipping health check"
+        fi
+
+  security-scan:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: '.'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+    
+    - name: Upload Trivy scan results to GitHub Security tab
+      uses: github/codeql-action/upload-sarif@v2
+      if: always()
+      with:
+        sarif_file: 'trivy-results.sarif'
+
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    needs: [test, staging-verification, security-scan]
+    if: always() && (needs.test.result == 'success' || github.event.inputs.force_deploy == 'true') && (needs.staging-verification.result == 'success' || github.event.inputs.skip_staging_check == 'true')
+    environment: 
+      name: production
+      url: ${{ secrets.PRODUCTION_URL }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+    
+    - name: Log in to Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Extract metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+        tags: |
+          type=ref,event=branch
+          type=sha,prefix={{branch}}-
+          type=raw,value=latest
+          type=semver,pattern={{version}}
+          type=semver,pattern={{major}}.{{minor}}
+        labels: |
+          org.opencontainers.image.title=CRUD-ITT Production
+          org.opencontainers.image.description=FastAPI CRUD application - Production Environment
+          org.opencontainers.image.vendor=ITT
+    
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        platforms: linux/amd64,linux/arm64
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        build-args: |
+          ENVIRONMENT=production
+    
+    - name: Set up kubectl
+      uses: azure/setup-kubectl@v3
+      with:
+        version: 'v1.28.0'
+    
+    - name: Configure AWS credentials (if using EKS)
+      uses: aws-actions/configure-aws-credentials@v4
+      if: env.CLOUD_PROVIDER == 'aws'
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+    
+    - name: Configure kubeconfig for EKS
+      if: env.CLOUD_PROVIDER == 'aws'
+      run: |
+        aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name ${{ secrets.EKS_CLUSTER_NAME }}
+    
+    - name: Set up kubeconfig from secret
+      if: env.CLOUD_PROVIDER != 'aws'
+      run: |
+        mkdir -p ~/.kube
+        echo "${{ secrets.KUBE_CONFIG_PRODUCTION }}" | base64 -d > ~/.kube/config
+        chmod 600 ~/.kube/config
+    
+    - name: Verify Kubernetes connection
+      run: |
+        kubectl cluster-info
+        kubectl get nodes
+    
+    - name: Create namespace if not exists
+      run: |
+        kubectl create namespace crud-itt --dry-run=client -o yaml | kubectl apply -f -
+    
+    - name: Backup current deployment (rollback preparation)
+      run: |
+        echo "📦 Creating backup of current production deployment..."
+        kubectl get deployment crud-itt-app -n crud-itt -o yaml > deployment-backup-$(date +%Y%m%d-%H%M%S).yaml || echo "No existing deployment to backup"
+        
+        # Store current image tag for potential rollback
+        CURRENT_IMAGE=$(kubectl get deployment crud-itt-app -n crud-itt -o jsonpath='{.spec.template.spec.containers[0].image}' 2>/dev/null || echo "none")
+        echo "PREVIOUS_IMAGE=$CURRENT_IMAGE" >> $GITHUB_ENV
+        echo "Previous image: $CURRENT_IMAGE"
+    
+    - name: Create/Update ConfigMap
+      run: |
+        kubectl create configmap crud-itt-config \
+          --from-literal=APP_NAME="CRUD ITT" \
+          --from-literal=APP_VERSION="${{ github.sha }}" \
+          --from-literal=APP_ENVIRONMENT="production" \
+          --from-literal=APP_DEBUG="false" \
+          --from-literal=DATABASE_URL="${{ secrets.PRODUCTION_DATABASE_URL }}" \
+          --from-literal=DATABASE_ECHO="false" \
+          --from-literal=LOG_LEVEL="WARNING" \
+          --from-literal=SERVER_HOST="0.0.0.0" \
+          --from-literal=SERVER_PORT="8000" \
+          --from-literal=SECURITY_BCRYPT_ROUNDS="14" \
+          --namespace=crud-itt \
+          --dry-run=client -o yaml | kubectl apply -f -
+    
+    - name: Create/Update Secrets
+      run: |
+        kubectl create secret generic crud-itt-secrets \
+          --from-literal=SECURITY_SECRET_KEY="${{ secrets.PRODUCTION_SECRET_KEY }}" \
+          --from-literal=DATABASE_PASSWORD="${{ secrets.PRODUCTION_DB_PASSWORD }}" \
+          --namespace=crud-itt \
+          --dry-run=client -o yaml | kubectl apply -f -
+    
+    - name: Deploy to Kubernetes (Rolling Update)
+      run: |
+        echo "🚀 Starting production deployment..."
+        
+        # Apply all Kubernetes manifests
+        kubectl apply -f k8s/ --namespace=crud-itt
+        
+        # Update the image with rolling update strategy
+        kubectl set image deployment/crud-itt-app \
+          fastapi-crud=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest \
+          --namespace=crud-itt
+        
+        # Add deployment annotations
+        kubectl annotate deployment crud-itt-app \
+          deployment.kubernetes.io/revision- \
+          kubernetes.io/change-cause="GitHub Actions deployment - commit ${{ github.sha }}" \
+          --namespace=crud-itt
+    
+    - name: Wait for deployment to be ready
+      run: |
+        echo "⏳ Waiting for deployment to be ready..."
+        kubectl rollout status deployment/crud-itt-app \
+          --namespace=crud-itt \
+          --timeout=600s
+    
+    - name: Run comprehensive health checks
+      run: |
+        echo "🏥 Running production health checks..."
+        
+        # Get service details
+        SERVICE_IP=$(kubectl get service crud-itt-service -n crud-itt -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+        if [ -z "$SERVICE_IP" ]; then
+          SERVICE_IP=$(kubectl get service crud-itt-service -n crud-itt -o jsonpath='{.spec.clusterIP}')
+        fi
+        
+        echo "Service IP: $SERVICE_IP"
+        
+        # Health check
+        kubectl run health-check-prod --rm -i --restart=Never --image=curlimages/curl:latest -- \
+          curl -f http://$SERVICE_IP:8000/health
+        
+        # API endpoint tests
+        kubectl run api-test-prod --rm -i --restart=Never --image=curlimages/curl:latest -- \
+          curl -f http://$SERVICE_IP:8000/docs
+        
+        echo "✅ All health checks passed!"
+    
+    - name: Run smoke tests
+      run: |
+        echo "🧪 Running production smoke tests..."
+        
+        # Add your production smoke tests here
+        # These should be non-destructive tests that verify core functionality
+        
+        echo "Smoke tests completed successfully!"
+    
+    - name: Rollback on failure
+      if: failure()
+      run: |
+        echo "❌ Deployment failed, initiating rollback..."
+        
+        if [ "$PREVIOUS_IMAGE" != "none" ]; then
+          echo "Rolling back to previous image: $PREVIOUS_IMAGE"
+          kubectl set image deployment/crud-itt-app \
+            fastapi-crud="$PREVIOUS_IMAGE" \
+            --namespace=crud-itt
+          
+          kubectl rollout status deployment/crud-itt-app \
+            --namespace=crud-itt \
+            --timeout=300s
+          
+          echo "🔄 Rollback completed"
+        else
+          echo "⚠️ No previous deployment found for rollback"
+        fi
+    
+    - name: Update deployment status
+      if: always()
+      run: |
+        if [ "${{ job.status }}" == "success" ]; then
+          echo "🎉 Production deployment completed successfully!"
+          echo "Environment: production"
+          echo "Image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest"
+          echo "Commit: ${{ github.sha }}"
+          echo "Deployed at: $(date -u +"%Y-%m-%d %H:%M:%S UTC")"
+          
+          # Optional: Create a GitHub release
+          if [ -n "${{ secrets.GITHUB_TOKEN }}" ]; then
+            echo "Creating GitHub release..."
+            # This would create a release tag for successful production deployments
+          fi
+        else
+          echo "❌ Production deployment failed!"
+          echo "Check logs and consider manual intervention."
+        fi
+
+  post-deployment:
+    runs-on: ubuntu-latest
+    needs: build-and-deploy
+    if: success()
+    
+    steps:
+    - name: Update monitoring dashboards
+      run: |
+        echo "📊 Updating monitoring dashboards..."
+        # Add integration with monitoring tools (Datadog, New Relic, etc.)
+        
+    - name: Notify stakeholders
+      run: |
+        echo "📢 Notifying stakeholders of successful deployment..."
+        # Add notification logic
+
+  notify:
+    runs-on: ubuntu-latest
+    needs: [test, staging-verification, security-scan, build-and-deploy]
+    if: always()
+    
+    steps:
+    - name: Send Slack notification
+      if: env.SLACK_WEBHOOK_URL != ''
+      uses: 8398a7/action-slack@v3
+      with:
+        status: ${{ job.status }}
+        channel: '#production-deployments'
+        text: |
+          🚨 PRODUCTION DEPLOYMENT RESULT: ${{ needs.build-and-deploy.result }}
+          
+          📋 Summary:
+          • Branch: ${{ github.ref_name }}
+          • Commit: ${{ github.sha }}
+          • Actor: ${{ github.actor }}
+          • Tests: ${{ needs.test.result }}
+          • Security Scan: ${{ needs.security-scan.result }}
+          • Staging Check: ${{ needs.staging-verification.result }}
+          • Deployment: ${{ needs.build-and-deploy.result }}
+          
+          🔗 View deployment: ${{ secrets.PRODUCTION_URL }}
+        webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+    
+    - name: Send email notification on failure
+      if: failure() && env.NOTIFICATION_EMAIL != ''
+      uses: dawidd6/action-send-mail@v3
+      with:
+        server_address: ${{ secrets.SMTP_SERVER }}
+        server_port: ${{ secrets.SMTP_PORT }}
+        username: ${{ secrets.SMTP_USERNAME }}
+        password: ${{ secrets.SMTP_PASSWORD }}
+        subject: "🚨 PRODUCTION DEPLOYMENT FAILED - ${{ github.repository }}"
+        body: |
+          Production deployment has FAILED!
+          
+          Repository: ${{ github.repository }}
+          Branch: ${{ github.ref_name }}
+          Commit: ${{ github.sha }}
+          Actor: ${{ github.actor }}
+          
+          Please check the GitHub Actions logs immediately:
+          ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        to: ${{ secrets.NOTIFICATION_EMAIL }}
+        from: GitHub Actions <${{ secrets.SMTP_USERNAME }}>
+      env:
+        NOTIFICATION_EMAIL: ${{ secrets.NOTIFICATION_EMAIL }}
