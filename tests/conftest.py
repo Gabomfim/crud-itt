@@ -75,3 +75,19 @@ def sample_user():
         "age": 25,
         "description": "Test user description",
     }
+
+
+@pytest.fixture
+def auth_headers(client, sample_user):
+    """Create a user and return authentication headers"""
+    # Create user
+    client.post("/api/v1/users", json=sample_user)
+
+    # Login to get token
+    login_response = client.post(
+        "/api/v1/auth/login",
+        json={"username": sample_user["username"], "password": sample_user["password"]},
+    )
+
+    token = login_response.json()["token"]["access_token"]
+    return {"Authorization": f"Bearer {token}"}

@@ -26,12 +26,23 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.responses import Response as StarletteResponse
+from starlette.templating import _TemplateResponse
 
 from api.v1.api import api_router
 from config import settings
 from database.connection import init_database
 from utils.logging_config import get_logger, setup_logging
 from utils.middleware import HealthCheckMiddleware, RequestLoggingMiddleware
+
+
+def render_template(
+    request: Request, template_name: str, status_code: int = 200
+) -> _TemplateResponse:
+    """Helper function to render templates with proper typing"""
+    return templates.TemplateResponse(
+        request, template_name, status_code=status_code
+    )  # type: ignore
+
 
 # Setup logging using Pydantic settings
 setup_logging(app_name=settings.app.name)
@@ -134,7 +145,7 @@ async def read_root(request: Request) -> StarletteResponse:
         Response: HTML page with application interface
     """
     logger.info("Serving root page")
-    return templates.TemplateResponse("index.html", {"request": request})
+    return render_template(request, "index.html")
 
 
 # Custom error handler for non-API 404s only
@@ -173,9 +184,7 @@ async def custom_404_middleware(
                 "Serving custom 404 page",
                 extra={"path": request.url.path, "method": request.method},
             )
-            return templates.TemplateResponse(
-                "404.html", {"request": request}, status_code=404
-            )
+            return render_template(request, "404.html", status_code=404)
         return response  # type: ignore
     except Exception as e:
         logger.error(

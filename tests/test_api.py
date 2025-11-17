@@ -41,13 +41,12 @@ class TestUserAPI:
         data = response.json()
         assert "Username already exists" in data["detail"]
 
-    def test_get_user_success(self, client: TestClient, sample_user):
+    def test_get_user_success(self, client: TestClient, auth_headers, sample_user):
         """Test successful user retrieval"""
-        # Create user first
-        client.post("/api/v1/users", json=sample_user)
-
-        # Get user
-        response = client.get(f"/api/v1/users/{sample_user['username']}")
+        # Get user (user is already created by auth_headers fixture)
+        response = client.get(
+            f"/api/v1/users/{sample_user['username']}", headers=auth_headers
+        )
         assert response.status_code == 200
         data = response.json()
         assert data["username"] == sample_user["username"]
@@ -56,14 +55,14 @@ class TestUserAPI:
         assert "id" in data
         assert "password" not in data  # Should not return password
 
-    def test_get_user_not_found(self, client: TestClient):
+    def test_get_user_not_found(self, client: TestClient, auth_headers):
         """Test getting non-existent user"""
-        response = client.get("/api/v1/users/nonexistent")
+        response = client.get("/api/v1/users/nonexistent", headers=auth_headers)
         assert response.status_code == 404
         data = response.json()
         assert "User not found" in data["detail"]
 
-    def test_get_users_by_minimum_age(self, client: TestClient):
+    def test_get_users_by_minimum_age(self, client: TestClient, auth_headers):
         """Test getting users by minimum age"""
         # Create test users
         users = [
@@ -91,30 +90,31 @@ class TestUserAPI:
             client.post("/api/v1/users", json=user)
 
         # Test minimum age filter
-        response = client.get("/api/v1/users?minimum_age=25")
+        response = client.get("/api/v1/users?minimum_age=25", headers=auth_headers)
         assert response.status_code == 200
         data = response.json()
-        assert len(data) == 2  # Should return middle and old users
+        assert (
+            len(data) == 3
+        )  # Should return testuser (25), middle (30) and old (50) users
         usernames = [user["username"] for user in data]
+        assert "testuser" in usernames
         assert "middle" in usernames
         assert "old" in usernames
         assert "young" not in usernames
 
-    def test_get_users_no_match(self, client: TestClient, sample_user):
+    def test_get_users_no_match(self, client: TestClient, auth_headers):
         """Test getting users with no matches"""
-        # Create a young user
-        client.post("/api/v1/users", json=sample_user)
+        # User is already created by auth_headers fixture
 
         # Search for users older than the created user
-        response = client.get("/api/v1/users?minimum_age=100")
+        response = client.get("/api/v1/users?minimum_age=100", headers=auth_headers)
         assert response.status_code == 404
         data = response.json()
         assert "No users found" in data["detail"]
 
-    def test_update_user_success(self, client: TestClient, sample_user):
+    def test_update_user_success(self, client: TestClient, auth_headers, sample_user):
         """Test successful user update"""
-        # Create user first
-        client.post("/api/v1/users", json=sample_user)
+        # User is already created by auth_headers fixture
 
         # Update user
         updated_data = {
@@ -124,11 +124,13 @@ class TestUserAPI:
             "description": "Updated description",
         }
         response = client.put(
-            f"/api/v1/users/{sample_user['username']}", json=updated_data
+            f"/api/v1/users/{sample_user['username']}",
+            json=updated_data,
+            headers=auth_headers,
         )
         assert response.status_code == 204
 
-    def test_update_user_not_found(self, client: TestClient):
+    def test_update_user_not_found(self, client: TestClient, auth_headers):
         """Test updating non-existent user"""
         update_data = {
             "username": "newname",
@@ -136,27 +138,39 @@ class TestUserAPI:
             "age": 25,
             "description": "New description",
         }
-        response = client.put("/api/v1/users/nonexistent", json=update_data)
+        response = client.put(
+            "/api/v1/users/nonexistent", json=update_data, headers=auth_headers
+        )
         assert response.status_code == 404
         data = response.json()
         assert "User not found" in data["detail"]
 
-    def test_delete_user_success(self, client: TestClient, sample_user):
+    def test_delete_user_success(self, client: TestClient, auth_headers):
         """Test successful user deletion"""
-        # Create user first
-        client.post("/api/v1/users", json=sample_user)
+        # Create a separate user for deletion (different from auth user)
+        delete_user = {
+            "username": "deleteme",
+            "password": "TestPass123!",
+            "age": 30,
+            "description": "User to be deleted",
+        }
+        client.post("/api/v1/users", json=delete_user)
 
         # Delete user
-        response = client.delete(f"/api/v1/users/{sample_user['username']}")
+        response = client.delete(
+            f"/api/v1/users/{delete_user['username']}", headers=auth_headers
+        )
         assert response.status_code == 204
 
         # Verify user is deleted
-        response = client.get(f"/api/v1/users/{sample_user['username']}")
+        response = client.get(
+            f"/api/v1/users/{delete_user['username']}", headers=auth_headers
+        )
         assert response.status_code == 404
 
-    def test_delete_user_not_found(self, client: TestClient):
+    def test_delete_user_not_found(self, client: TestClient, auth_headers):
         """Test deleting non-existent user"""
-        response = client.delete("/api/v1/users/nonexistent")
+        response = client.delete("/api/v1/users/nonexistent", headers=auth_headers)
         assert response.status_code == 404
         data = response.json()
         assert "User not found" in data["detail"]

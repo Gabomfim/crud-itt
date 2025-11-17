@@ -155,7 +155,7 @@ async def delete_user_by_username(
             logger.warning("User not found for deletion", extra={"username": username})
             raise HTTPException(status_code=404, detail="User not found")
 
-        db.delete(user)  # type: ignore
+        await db.delete(user)
         await db.commit()
 
         logger.info(
@@ -192,6 +192,8 @@ async def update_user_by_username(
             raise HTTPException(status_code=404, detail="User not found")
 
         # Update user fields
+        if user_request.username:
+            user.username = user_request.username
         if user_request.password:
             user.password = hash_password(user_request.password)
         if user_request.age is not None:

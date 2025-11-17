@@ -1,5 +1,7 @@
 import pytest
+import pytest_asyncio
 from fastapi import HTTPException
+from sqlalchemy import select
 
 from database.connection import User
 from models.requests import UserRequest
@@ -16,11 +18,26 @@ from services.user_service import (
 class TestUserService:
     """Test user service functions"""
 
-    def test_create_new_user_success(self, client):
-        """Test successful user creation in service"""
-        from tests.conftest import TestingSessionLocal
+    @pytest_asyncio.fixture
+    async def async_db_session(self):
+        """Create async database session for testing"""
+        from database.connection import Base
+        from tests.conftest import TestingAsyncSessionLocal, async_engine
 
-        db = TestingSessionLocal()
+        # Create tables
+        async with async_engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+
+        async with TestingAsyncSessionLocal() as session:
+            yield session
+
+        # Clean up tables
+        async with async_engine.begin() as conn:
+            await conn.run_sync(Base.metadata.drop_all)
+
+    @pytest.mark.asyncio
+    async def test_create_new_user_success(self, async_db_session):
+        """Test successful user creation in service"""
         user_request = UserRequest(
             username="servicetest",
             password="TestPass123!",
@@ -28,44 +45,37 @@ class TestUserService:
             description="Service test user",
         )
 
-        result = create_new_user(user_request, db)
+        result = await create_new_user(user_request, async_db_session)
         assert result["message"] == "User created successfully"
 
         # Verify user was created
-        user = db.query(User).filter(User.username == "servicetest").first()
+        stmt = select(User).where(User.username == "servicetest")
+        result_set = await async_db_session.execute(stmt)
+        user = result_set.scalar_one_or_none()
         assert user is not None
         assert user.username == "servicetest"
         assert user.age == 25
 
-        db.close()
-
-    def test_create_duplicate_user_service(self, client):
+    @pytest.mark.asyncio
+    async def test_create_duplicate_user_service(self, async_db_session):
         """Test creating duplicate user in service"""
-        from tests.conftest import TestingSessionLocal
-
-        db = TestingSessionLocal()
         user_request = UserRequest(
             username="duplicate", password="TestPass123!", age=25
         )
 
         # Create first user
-        create_new_user(user_request, db)
+        await create_new_user(user_request, async_db_session)
 
         # Try to create duplicate
         with pytest.raises(HTTPException) as exc_info:
-            create_new_user(user_request, db)
+            await create_new_user(user_request, async_db_session)
 
         assert exc_info.value.status_code == 400
         assert "Username already exists" in exc_info.value.detail
 
-        db.close()
-
-    def test_get_user_by_username_success(self, client):
+    @pytest.mark.asyncio
+    async def test_get_user_by_username_success(self, async_db_session):
         """Test getting user by username"""
-        from tests.conftest import TestingSessionLocal
-
-        db = TestingSessionLocal()
-
         # Create user first
         user_request = UserRequest(
             username="gettest",
@@ -73,37 +83,27 @@ class TestUserService:
             age=30,
             description="Get test user",
         )
-        create_new_user(user_request, db)
+        await create_new_user(user_request, async_db_session)
 
         # Get user
-        result = get_user_by_username("gettest", db)
+        result = await get_user_by_username("gettest", async_db_session)
         assert isinstance(result, UserResponse)
         assert result.username == "gettest"
         assert result.age == 30
         assert result.description == "Get test user"
 
-        db.close()
-
-    def test_get_user_not_found_service(self, client):
+    @pytest.mark.asyncio
+    async def test_get_user_not_found_service(self, async_db_session):
         """Test getting non-existent user"""
-        from tests.conftest import TestingSessionLocal
-
-        db = TestingSessionLocal()
-
         with pytest.raises(HTTPException) as exc_info:
-            get_user_by_username("nonexistent", db)
+            await get_user_by_username("nonexistent", async_db_session)
 
         assert exc_info.value.status_code == 404
         assert "User not found" in exc_info.value.detail
 
-        db.close()
-
-    def test_get_users_by_minimum_age_service(self, client):
+    @pytest.mark.asyncio
+    async def test_get_users_by_minimum_age_service(self, async_db_session):
         """Test getting users by minimum age"""
-        from tests.conftest import TestingSessionLocal
-
-        db = TestingSessionLocal()
-
         # Create test users
         users = [
             UserRequest(username="young", password="TestPass123!", age=20),
@@ -112,29 +112,24 @@ class TestUserService:
         ]
 
         for user in users:
-            create_new_user(user, db)
+            await create_new_user(user, async_db_session)
 
         # Test filtering
-        result = get_users_by_minimum_age(30, db)
+        result = await get_users_by_minimum_age(30, async_db_session)
         assert len(result) == 2
         usernames = [user.username for user in result]
         assert "middle" in usernames
         assert "old" in usernames
         assert "young" not in usernames
 
-        db.close()
-
-    def test_update_user_service(self, client):
+    @pytest.mark.asyncio
+    async def test_update_user_service(self, async_db_session):
         """Test updating user"""
-        from tests.conftest import TestingSessionLocal
-
-        db = TestingSessionLocal()
-
         # Create user
         user_request = UserRequest(
             username="updatetest", password="TestPass123!", age=25
         )
-        create_new_user(user_request, db)
+        await create_new_user(user_request, async_db_session)
 
         # Update user
         update_request = UserRequest(
@@ -143,35 +138,37 @@ class TestUserService:
             age=30,
             description="Updated description",
         )
-        result = update_user_by_username("updatetest", update_request, db)
+        result = await update_user_by_username(
+            "updatetest", update_request, async_db_session
+        )
         assert result["message"] == "User updated successfully"
 
+        # Refresh session to ensure we see the changes
+        await async_db_session.commit()
+
         # Verify update
-        updated_user = db.query(User).filter(User.username == "updated").first()
+        stmt = select(User).where(User.username == "updated")
+        result_set = await async_db_session.execute(stmt)
+        updated_user = result_set.scalar_one_or_none()
         assert updated_user is not None
         assert updated_user.age == 30
         assert updated_user.description == "Updated description"
 
-        db.close()
-
-    def test_delete_user_service(self, client):
+    @pytest.mark.asyncio
+    async def test_delete_user_service(self, async_db_session):
         """Test deleting user"""
-        from tests.conftest import TestingSessionLocal
-
-        db = TestingSessionLocal()
-
         # Create user
         user_request = UserRequest(
             username="deletetest", password="TestPass123!", age=25
         )
-        create_new_user(user_request, db)
+        await create_new_user(user_request, async_db_session)
 
         # Delete user
-        result = delete_user_by_username("deletetest", db)
+        result = await delete_user_by_username("deletetest", async_db_session)
         assert result["message"] == "User deleted successfully"
 
         # Verify deletion
-        deleted_user = db.query(User).filter(User.username == "deletetest").first()
+        stmt = select(User).where(User.username == "deletetest")
+        result_set = await async_db_session.execute(stmt)
+        deleted_user = result_set.scalar_one_or_none()
         assert deleted_user is None
-
-        db.close()
